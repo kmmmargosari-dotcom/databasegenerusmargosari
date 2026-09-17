@@ -296,6 +296,7 @@ function renderKasLineChart(tahun){
       var pts=[];
       data.forEach(function(v,i){ pts.push([xP(i), yP(v)]); });
       var d=smoothLinePath(pts);
+      if(!d) return '';
       d+='L '+(W-padR).toFixed(2)+' '+(padT+cH).toFixed(2)+' L '+padL+' '+(padT+cH).toFixed(2)+' Z';
       return '<path d="'+d+'" fill="'+color+'" opacity="0.08"/>';
     }
@@ -306,7 +307,9 @@ function renderKasLineChart(tahun){
     function line(data,color){
       var pts=[];
       data.forEach(function(v,i){ pts.push([xP(i), yP(v)]); });
-      return '<path d="'+smoothLinePath(pts)+'" fill="none" stroke="'+color+'" stroke-width="'+(isMob?1.8:2.2)+'" stroke-linejoin="round" stroke-linecap="round"/>';
+      var d=smoothLinePath(pts);
+      if(!d) return '';
+      return '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="'+(isMob?1.8:2.2)+'" stroke-linejoin="round" stroke-linecap="round"/>';
     }
     svg+=line(masuk,'#2d6a4f');
     svg+=line(keluar,'#ba1a1a');

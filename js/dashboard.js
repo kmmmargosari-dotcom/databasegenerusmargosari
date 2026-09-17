@@ -266,8 +266,9 @@ function buildDashChart(sesiStats){
   }
   function areaPath(vals){
     var pts = vals.map(function(v,i){ return [tx(i), ty(Math.min(v,maxVal))]; });
-    if(!pts.length) return '';
+    if(pts.length < 2) return '';
     var d = smoothLinePath(pts);
+    if(!d) return '';
     d += ' L '+pts[pts.length-1][0].toFixed(1)+' '+baseY+' L '+pts[0][0].toFixed(1)+' '+baseY+' Z';
     return d;
   }
@@ -297,8 +298,8 @@ function buildDashChart(sesiStats){
       '<title>'+escHtml(fullStatLabel(s))+'</title>Sesi '+(i+1)+'</text>';
   }).join('');
 
-  var areas = SERIES.map(function(s){ return '<path d="'+areaPath(s.vals)+'" fill="url(#'+s.grad+')"></path>'; }).join('');
-  var lines = SERIES.map(function(s){ return '<path d="'+linePath(s.vals)+'" fill="none" stroke="'+s.color+'" stroke-linecap="round" stroke-width="3"></path>'; }).join('');
+  var areas = SERIES.map(function(s){ var d=areaPath(s.vals); return d ? '<path d="'+d+'" fill="url(#'+s.grad+')"></path>' : ''; }).join('');
+  var lines = SERIES.map(function(s){ var d=linePath(s.vals); return d ? '<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-linecap="round" stroke-width="3"></path>' : ''; }).join('');
   var dots = SERIES.map(function(s){
     return s.vals.map(function(v,i){
       var t = 'Sesi '+(i+1)+': '+s.name+' '+v+' Generus';

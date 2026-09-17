@@ -168,7 +168,7 @@ function rekapTbodyHtml(sL, mAll, rg){
     });
     var pct=sL.length?Math.round(h/sL.length*100):0;
     var pc=pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
-    var namaCell = escHtml(m.nama) + ((cab && m.kelas) ? ' <span class="kelas-pill kelas-pill-tbl">'+escHtml(m.kelas)+'</span>' : '');
+    var namaCell = escHtml(m.nama);
     return '<tr><td>'+noCount+'</td><td class="tl">'+namaCell+'</td>'+cells+
       '<td style="color:var(--green);font-weight:500">'+h+'</td>'+
       '<td style="color:var(--amber)">'+iz+'</td><td style="color:var(--red)">'+al+'</td>'+

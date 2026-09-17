@@ -1,0 +1,249 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*{-webkit-tap-highlight-color:transparent}
+:root{
+  /* Tema luxury: hijau #1b4332 di atas stone terang, tanpa krem coklat. */
+  --gold:#1b4332;           /* accent: hijau tua (primary CTA)           */
+  --gold-dk:#1b4332;        /* accent-press: hijau pekat saat ditekan    */
+  --gold-lt:#ebf5f0;        /* tint: pita hijau lembut                   */
+  --gold-xlt:#ebf5f0;       /* tint paling pucat: wash kartu             */
+  --brown:#4b5563;          /* netral stone (pengganti merah-bata)       */
+  --red:#ba1a1a;--red-lt:#fee2e2;--red-dk:#991b1b;    /* Alfa/danger      */
+  --amber:#b45309;--amber-lt:#fef3c7;                /* amber (Izin)     */
+  --green:#2d6a4f;--green-lt:#ebf5f0;                /* hijau (Hadir)    */
+  --border:#e8e6df;         /* garis stone netral                         */
+  --bg:#ffffff;--bg2:#fbf9f6;--bg3:#e8e6df;          /* putih hangat + sand*/
+  --text:#1f2937;--text2:#4b5563;--text3:#717973;    /* stone + pudar     */
+  --r:7px;--rl:11px;--rxl:17px;
+  --rbig:19px;
+  --font-display:'Zilla Slab',Georgia,'Times New Roman',serif;
+  --font-body:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-label:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --shadow:0 1px 2px rgba(28,25,23,.07),0 3px 10px rgba(28,25,23,.08);
+  --shadow-md:0 10px 30px rgba(28,25,23,.14);
+  --shadow-soft:0 2px 6px rgba(28,25,23,.05),0 10px 26px rgba(28,25,23,.10);
+}
+body{font-family:var(--font-body);font-size:14px;color:var(--text);background:var(--bg2);-webkit-font-smoothing:antialiased}
+
+/* ── ELEMENTS ── */
+button{font-size:13px;padding:7px 14px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:all .15s ease,transform .1s ease;font-family:inherit;line-height:1.4}
+button:hover{background:var(--bg2)}
+button:active{transform:scale(0.95)}
+.btn-p{background:var(--gold);color:#ffffff;border-color:var(--gold-dk);font-weight:500;letter-spacing:.2px}
+.btn-p:hover{background:var(--gold-dk)}
+.btn-p:active{transform:scale(0.95);background:var(--gold-dk)}
+.btn-full{width:100%}
+.btn-danger{background:var(--red-lt);color:var(--red-dk);border-color:#ffdad6}
+.btn-danger:hover{background:#ffdad6}
+input,select{font-size:13px;padding:9px 12px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);color:var(--text);width:100%;outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(63,138,83,.15)}
+input::placeholder{color:var(--text3)}
+
+/* ── TYPE: ledger display + label fonts ── */
+.pc-topbar-title,.mob-pg-hd h3,.login-card-title,.sidebar-title,.mdet-name{font-family:var(--font-display);font-weight:600;letter-spacing:0}
+
+/* ── SVG ICONS ── */
+.ico{display:inline-block;vertical-align:middle;width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── BADGES ── */
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;display:inline-block}
+.bh{background:var(--green-lt);color:var(--green)}
+.bi{background:var(--amber-lt);color:var(--amber)}
+.ba{background:var(--red-lt);color:var(--red)}
+.log-badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;display:inline-block;white-space:nowrap}
+.log-absen{background:var(--green-lt);color:var(--green)}
+.log-kas{background:var(--amber-lt);color:var(--amber)}
+.log-anggota{background:#ebf5f0;color:#1b4332}
+.log-sesi{background:#e4e2df;color:#2b6070}
+
+/* ── SEGMENT ── */
+.seg{display:flex;background:var(--bg2);border-radius:var(--r);padding:3px;gap:2px}
+.seg-btn{flex:1;padding:5px 8px;font-size:12px;font-weight:500;border:none;background:none;border-radius:6px;cursor:pointer;color:var(--text2);transition:all .15s;font-family:inherit}
+.seg-btn.on{background:var(--bg);color:var(--text);box-shadow:var(--shadow)}
+
+/* ── COUNTER BAR ── */
+.counter-bar{display:flex;align-items:center;gap:16px;padding:8px 16px;background:var(--bg2);font-size:12px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.ci{display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dh{background:var(--green)}.di{background:var(--amber)}.da{background:var(--red)}.dx{background:var(--border)}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;padding:10px 16px 5px;background:var(--bg3)}
+
+/* ── TABLE ── */
+.scroll-x{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border:1px solid var(--border);padding:6px 8px;text-align:center;white-space:nowrap}
+th{background:var(--bg2);font-weight:500;font-size:11px;letter-spacing:.2px;color:var(--text2)}
+td.tl{text-align:left}
+tr.gender-sep td{background:var(--bg3);color:var(--text2);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:5px 8px;text-align:left}
+tr.gender-sep-l td{background:var(--green-lt);color:var(--green)}
+tr.gender-sep-p td{background:#ebf5f0;color:#1b4332}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);background:var(--bg2);align-items:center;flex-wrap:wrap}
+.toolbar select{flex:1;min-width:90px}
+
+/* ── FORM ── */
+.fr{margin-bottom:12px}
+.fr label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500}
+
+/* ── SYNC BADGE & USER INFO ── */
+.sync-badge{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 11px;border-radius:20px;font-weight:500;letter-spacing:.1px;white-space:nowrap;transition:all .3s;border:1px solid transparent}
+.sync-ok  {background:var(--green-lt);color:var(--green);border-color:#ebf5f0}
+.sync-off {background:var(--red-lt);color:var(--red);border-color:#ffdad6}
+.sync-save{background:var(--amber-lt);color:var(--amber);border-color:#f0bd8b}
+.sync-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+#pc-sync-badge{margin:6px 12px;border-radius:20px}
+.user-info{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--border);background:var(--bg)}
+.u-av{width:30px;height:30px;border-radius:50%;background:var(--gold-lt);color:var(--brown);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--gold)}
+.u-nama{font-size:12px;font-weight:500}
+.u-role{font-size:10px;color:var(--text3);text-transform:capitalize;letter-spacing:.2px}
+
+/* ── DB ITEM ── */
+.db-section-hd{font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--text3);padding:14px 16px 6px;background:var(--bg2);border-top:2px solid var(--bg3);border-bottom:1px solid var(--border);margin-top:4px}
+.db-section-hd:first-child{margin-top:0;border-top:none}
+.db-item{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap}
+.db-item:last-child{border-bottom:none}
+.db-info{flex:1;min-width:120px}
+.db-name{font-size:13px;font-weight:500}
+.db-ket{font-size:11px;color:var(--gold-dk);margin-top:1px;font-style:italic}
+.db-sub{font-size:11px;color:var(--text2);margin-top:3px}
+.db-badges{display:flex;gap:4px;flex-wrap:wrap}
+
+/* ── MEMBER ITEM ── */
+.mem-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+.mem-info{flex:1}
+.mem-name{font-size:13px;font-weight:500}
+.mem-gender{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ── EMPTY STATE ── */
+.empty{padding:40px;text-align:center;color:var(--text3);font-size:12px;letter-spacing:.2px}
+
+/* ── SELESAI FOOTER ── */
+.selesai-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.selesai-bar-info{font-size:12px;color:var(--text2)}
+.selesai-bar-info strong{color:var(--text);font-weight:500}
+
+/* ── ABSENSI ITEM ── */
+.ab-item{background:var(--bg);border-bottom:1px solid var(--border);animation:fadeUp .15s ease both}
+.ab-row{display:flex;align-items:center;gap:10px;padding:11px 14px}
+.avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:.3px}
+.av-p{background:var(--gold-lt);color:var(--gold-dk);border:1px solid #ebf5f0}
+.av-l{background:var(--amber-lt);color:var(--amber);border:1px solid #f0bd8b}
+.ab-info{flex:1;min-width:0}
+.ab-name{font-size:13px;font-weight:500;line-height:1.3;color:var(--text)}
+.ab-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.ab-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.sp{font-size:11px;padding:4px 10px;border-radius:99px;font-weight:500;cursor:pointer;border:none;display:flex;align-items:center;gap:4px;transition:opacity .15s;white-space:nowrap;font-family:inherit}
+.sp:hover{opacity:.75}
+.sp:active{transform:scale(0.92)}
+.sp-h{background:var(--green-lt);color:var(--green)}
+.sp-i{background:var(--amber-lt);color:var(--amber)}
+.sp-a{background:var(--red-lt);color:var(--red)}
+.sp-x{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.more-btn{background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:4px 3px;line-height:1;letter-spacing:2px;font-family:inherit}
+.more-btn:hover{color:var(--text);background:none}
+
+.ig{background:var(--green-lt);color:var(--green)}
+.iamb{background:var(--amber-lt);color:var(--amber)}
+.ir{background:var(--red-lt);color:var(--red)}
+.igr{background:var(--bg2);color:var(--text2)}
+
+/* ── STATUS FLOATING MENU ── */
+#status-menu-overlay{display:none;position:fixed;inset:0;z-index:800}
+#status-menu-overlay.show{display:block;animation:overlayIn .18s ease-out both}
+.status-menu{display:none;position:fixed;z-index:801;background:var(--bg);border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 8px 28px rgba(40,58,44,.15);min-width:190px;overflow:hidden}
+.status-menu.show{display:block;animation:smIn .14s ease both}
+@keyframes smIn{from{opacity:0;transform:scale(.93) translateY(-4px)} to{opacity:1;transform:scale(1) translateY(0)}}
+.status-menu-title{font-size:11px;font-weight:600;color:var(--text2);padding:9px 14px 7px;border-bottom:1px solid var(--border);letter-spacing:.2px}
+.sm-btn{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);font-family:inherit;transition:background .1s}
+.sm-btn:last-child{border-bottom:none}
+.sm-btn:hover{background:var(--bg2)}
+.sm-btn:active{background:var(--bg3)}
+.sm-sep{height:1px;background:var(--border);margin:2px 0}
+.sm-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+
+/* ── IZIN TEMPLATES ── */
+.izin-templates{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.izin-tpl{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--amber);color:var(--amber);background:var(--amber-lt);cursor:pointer;font-weight:500;font-family:inherit;transition:all .12s;white-space:nowrap;width:auto}
+.izin-tpl:hover{background:var(--amber);color:#ffffff}
+.izin-tpl:active{transform:scale(0.93)}
+
+/* ── REKAP SUMMARY PANEL ── */
+.rs-panel{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg);gap:0;min-height:0}
+.rs-donut-area{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;padding-right:4px}
+.rs-donut-lbl{font-size:9px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text3)}
+.rs-divider{width:1px;background:var(--border);align-self:stretch;margin:0 16px;flex-shrink:0}
+.rs-stats{display:flex;flex:1;justify-content:space-around;align-items:center;flex-wrap:wrap;gap:2px}
+.rs-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border-radius:var(--r);transition:background .15s;cursor:default}
+.rs-item:hover{background:var(--bg2)}
+.rs-val{font-size:26px;font-weight:300;line-height:1;letter-spacing:-.5px}
+.rs-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:500;margin-top:3px}
+
+/* Label kecil & angka: font mono agar rapi dipindai. */
+.sec-title,.db-section-hd,.fr label,
+.rs-donut-lbl,.rs-lbl,.kas-cf-title,
+.kas-donut-ttl,
+.kas-line-title,.rekap-chart-title,
+.u-role,.izin-popup-label,.mdet-stat-lbl,
+.mdet-section-title,.mdet-table th,.mdet-status-lbl,.sidebar-label,
+.col-hd,.nstat-sub,.kas-riwayat-table th,tr.gender-sep td{
+  font-family:var(--font-label);
+}
+
+.rs-val,
+.kas-cf-saldo-akhir-val,.kas-cf-row-val,.kas-mob-total-val,.mdet-stat-val,
+.nstat-val,.kas-donut-leg-val{
+  font-family:var(--font-label);font-weight:600;font-variant-numeric:tabular-nums;
+}
+
+table td:not(.tl){font-family:var(--font-label);font-variant-numeric:tabular-nums}
+
+/* ══════════════════════════════════════════════════
+   MICRO-INTERACTIONS & POLISH
+   ══════════════════════════════════════════════════ */
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button:focus:not(:focus-visible),select:focus:not(:focus-visible){outline:none}
+.btn-p:hover{box-shadow:0 4px 14px rgba(31,92,61,.22);transform:translateY(-1px)}
+.btn-p:active{transform:translateY(0) scale(.96)}
+.btn.is-busy{position:relative;pointer-events:none;opacity:.9}
+.btn-spinner{
+  display:inline-block;width:13px;height:13px;vertical-align:-2px;margin-left:7px;
+  border:2px solid rgba(255,255,255,.4);border-top-color:#ffffff;border-radius:50%;
+  animation:btnSp .7s linear infinite;
+}
+@keyframes btnSp{to{transform:rotate(360deg)}}
+
+/* Card interaksi halus */
+.swipe-content,.mem-item,.db-item,.nstat-card,.exp-card,.tentang-feat{transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.swipe-content:hover,.mem-item:hover,.db-item:hover{background:var(--bg2)}
+.nstat-card:hover,.exp-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(36,31,22,.10)}
+.nstat-card:active,.exp-card:active,.mem-item:active{transform:scale(.98)}
+.db-item:active{background:var(--bg3)}
+
+/* Motion: durasi pendek & konsisten (150–250ms). */
+@keyframes listIn{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)}}
+
+/* Baris tabel: fade halus saat list dirender ulang */
+@keyframes rowIn{from{opacity:0} to{opacity:1}}
+
+/* Hapus item: ciutkan tinggi + fade sebelum list diganti */
+.collapsing{overflow:hidden!important;opacity:0!important;transform:scale(.94)!important;
+  transition:height .22s ease,margin .22s ease,padding .22s ease,opacity .18s ease,transform .18s ease!important}
+
+/* Feedback tap pada kartu/konten yang bisa diklik */
+.swipe-content.db-item:active{transform:scale(.985);background:var(--bg3)}
+
+/* Panel ringkasan (rekap) ikut fade saat dirender ulang */
+.rs-panel{animation:listIn .2s ease-out both}
+
+/* Aksesibilitas: hormati prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    transition-delay:0ms!important;
+    scroll-behavior:auto!important;
+  }
+}

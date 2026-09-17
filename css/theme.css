@@ -1,0 +1,126 @@
+/* ══════════════════════════════════════════════════════════════
+   SERENE CIVIC SANCTUARY — lapisan tema global (dimuat PALING AKHIR)
+   Satu bahasa visual: forest + bone, hairline, shadow lembut,
+   Plus Jakarta Sans, grid 8px, tabular numerics.
+   File ini me-remap variabel lama ke token DS + menyamakan komponen.
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  /* Token DS */
+  --sc-surface:#fbf9f6; --sc-low:#f5f3f0; --sc-container:#efeeea;
+  --sc-high:#e9e8e5; --sc-highest:#e4e2df;
+  --sc-card:#ffffff;
+  --sc-ink:#1b1c1a; --sc-ink-2:#414844; --sc-muted:#717973; --sc-faint:#9ca3af;
+  --sc-line:#e8e6df; --sc-line-2:#e4e2df;
+  --sc-primary:#012d1d; --sc-pine:#1b4332; --sc-pine-hover:#2d6a4f;
+  --sc-secondary:#006c48; --sc-sage:#52b788;
+  --sc-success:#2d6a4f; --sc-success-bg:#ebf5f0;
+  --sc-warn:#b45309; --sc-warn-deep:#92400e; --sc-warn-bg:#fef3c7;
+  --sc-error:#ba1a1a; --sc-error-deep:#991b1b; --sc-error-bg:#ffdad6; --sc-error-wash:#fef2f2;
+  /* Remap variabel lama → token (seluruh aplikasi mengikuti) */
+  --gold:#1b4332; --gold-dk:#012d1d; --gold-lt:#ebf5f0; --gold-xlt:#f5f3f0;
+  --brown:#414844;
+  --red:#ba1a1a; --red-lt:#ffdad6; --red-dk:#93000a;
+  --amber:#b45309; --amber-lt:#fef3c7;
+  --green:#2d6a4f; --green-lt:#ebf5f0;
+  --border:#e8e6df;
+  --bg:#ffffff; --bg2:#fbf9f6; --bg3:#efeeea;
+  --text:#1b1c1a; --text2:#414844; --text3:#717973;
+  --r:8px; --rl:12px; --rxl:16px; --rbig:16px;
+  --font-display:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-label:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --shadow:0 1px 3px rgba(27,67,50,.04),0 1px 2px rgba(27,67,50,.02);
+  --shadow-md:0 12px 32px rgba(27,67,50,.08),0 4px 8px rgba(0,0,0,.04);
+  --shadow-soft:0 4px 12px rgba(27,67,50,.06),0 2px 4px rgba(27,67,50,.03);
+}
+
+/* ── Fondasi ── */
+body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text)}
+.ico{stroke-width:1.75}
+/* Angka tabular agar kolom/kas/rekap sejajar */
+.kpi-val,.lux-hero-num,.rk-hero-num,.rk-mini-num,.stat-val,.cf-val,
+.kas-cf-row-val,.kas-cf-saldo-akhir-val,.lux-kas-saldo strong,
+.rekap-tbl-x td,.mdet-table td,.kas-riwayat-table td,.lux-bar-lbl,
+.mdet-stat-val,.rs-val{font-variant-numeric:tabular-nums}
+
+/* ── Tombol ── */
+.btn-p{background:#1b4332;border-color:#012d1d;color:#ffffff;font-weight:600}
+.btn-p:hover{background:#2d6a4f;border-color:#2d6a4f}
+.btn-p:active{transform:scale(.98)}
+.btn-p:focus-visible,.btn-sec:focus-visible{outline:2px solid #52b788;outline-offset:2px}
+.btn-sec{background:#ffffff;border:1px solid #e8e6df;color:#1f2937;font-weight:600}
+.btn-sec:hover{border-color:#52b788;background:#fbf9f6}
+.btn-danger{background:transparent;border:1px solid #ffdad6;color:#ba1a1a}
+.btn-danger:hover{background:#fef2f2}
+button:disabled{opacity:.55;cursor:not-allowed}
+
+/* ── Chip / badge status (24px pill, label-sm) ── */
+.badge,.kelas-pill,.log-badge,.rk-pill,.rekap-sesi-pill,.abs-ket-pill,
+.ang-count,.lux-sesi-pill,.rk-delta,.rs-trend-badge,.lain-mini{
+  display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;
+  border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.04em;line-height:1.4}
+.bh{background:rgba(82,183,136,.18);color:#1b4332}
+.bi{background:#fef3c7;color:#92400e}
+.ba{background:#fee2e2;color:#991b1b}
+.badge-arsip{background:#e9e8e5;color:#4b5563}
+.kelas-pill,.abs-ket-pill,.lux-sesi-pill,.rekap-sesi-pill,.lain-mini{background:#e9e8e5;color:#1b4332}
+.log-absen{background:rgba(82,183,136,.18);color:#1b4332}
+.log-kas{background:#fef3c7;color:#92400e}
+.log-anggota{background:#e9e8e5;color:#1b4332}
+.log-sesi{background:#e9e8e5;color:#414844}
+
+/* ── Kartu data ── */
+.nd-card,.ang-card,.kpi-card,.lux-card,.ndash-mob-card,.exp-card,
+.tentang-card,.tentang-feat,.tentang-guide-card,
+.rk-mini,.rk-hero,.kas-cf-card,.kas-donut-card,.kas-line-card,.kas-tbl-card,
+.rekap-matrix-card,.tbl-card,.mdet-table-wrap,.abs-card{
+  background:#ffffff;border:1px solid #e8e6df;border-radius:8px;
+  box-shadow:0 1px 3px rgba(27,67,50,.04),0 1px 2px rgba(27,67,50,.02)}
+/* Hero/callout besar */
+.lux-hero,.kas-hero,.abs-hero{border-radius:16px}
+
+/* ── Form ── */
+input,select,textarea{background:#ffffff;border:1px solid #e8e6df;border-radius:8px;color:#1f2937}
+input:not([type=checkbox]):not([type=radio]),select{height:40px}
+textarea{height:auto;min-height:88px}
+input::placeholder,textarea::placeholder{color:#9ca3af}
+input:focus,select:focus,textarea:focus{border-color:#1b4332;box-shadow:0 0 0 3px rgba(82,183,136,.25);outline:none}
+input[type=checkbox],input[type=radio]{height:18px;width:18px;accent-color:#1b4332}
+.fr label,.izin-popup-label,.exp-lbl,.exp-date-lbl{font-size:12px;font-weight:500;color:#414844;letter-spacing:.02em}
+
+/* ── Sidebar ── */
+.sidebar{background:#f5f3f0;border-right:1px solid #e8e6df}
+.si{color:#4b5563;position:relative}
+.si:hover{background:#e9e8e5;color:#1b1c1a}
+.si.on{background:rgba(82,183,136,.12);color:#1b4332;font-weight:600}
+.si.on::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:20px;border-radius:999px;background:#1b4332}
+
+/* ── Tabel ── */
+.rekap-tbl-x th,.mdet-table th,.kas-riwayat-table th{background:#f5f3f0;color:#414844;
+  font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.rekap-tbl-x td,.mdet-table td,.kas-riwayat-table td{border-color:#efeeea}
+
+/* ── Overlay + dialog ── */
+.izin-overlay,.mdet-overlay,#status-menu-overlay{background:rgba(31,41,55,.4);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.izin-popup,.mdet-modal,.status-menu{background:#ffffff;border:1px solid #e8e6df;border-radius:12px;
+  box-shadow:0 12px 32px rgba(27,67,50,.08),0 4px 8px rgba(0,0,0,.04)}
+
+/* ── Toast ── */
+#app-toast{background:#30312f;color:#f2f1ed;border-radius:8px;font-size:13px}
+
+/* ── Segmented control ── */
+.seg{background:#efeeea;border-radius:999px}
+.seg-btn{border-radius:999px}
+.seg-btn.on{background:#ffffff;color:#1b4332;font-weight:600;box-shadow:0 1px 3px rgba(27,67,50,.08)}
+
+/* ── State kosong / sync / navigasi bawah ── */
+.empty{color:#717973;padding:24px 16px;text-align:center;font-size:13px}
+.sync-badge{border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.04em}
+.sync-ok{background:rgba(82,183,136,.18);color:#1b4332}
+.sync-save{background:#fef3c7;color:#92400e}
+.sync-off{background:#fee2e2;color:#991b1b}
+.mob-nav-pill{background:#ffffff;border:1px solid #e8e6df}
+.mob-nav-item{color:#4b5563}
+.mob-nav-item.on{color:#1b4332;font-weight:600}

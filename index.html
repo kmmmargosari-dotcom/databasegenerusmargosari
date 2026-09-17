@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Database Generus Margosari</title>
+  <meta name="application-name" content="Database Generus Margosari"/>
+  <meta name="description" content="Database Generus Margosari — absensi, kas, dan rekap generasi penerus."/>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { initializeFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQdX4r2BrStdRIaRE7MsgGqEMjlnnW3ac",
+      authDomain: "absensirekap-cfbf0.firebaseapp.com",
+      projectId: "absensirekap-cfbf0",
+      storageBucket: "absensirekap-cfbf0.firebasestorage.app",
+      messagingSenderId: "452365600662",
+      appId: "1:452365600662:web:b91a1118668b3fb0b2bfb7",
+      measurementId: "G-63JZN3F1E4"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = initializeFirestore(app, {
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    });
+    const auth = getAuth(app);
+
+    window._db  = db;
+    window._auth = auth;
+    window._fsCol  = collection;
+    window._fsDoc  = doc;
+    window._fsSet  = setDoc;
+    window._fsDel  = deleteDoc;
+    window._fsSnap = onSnapshot;
+    window._fsGetDocs = getDocs;
+    window._fsGetDoc  = getDoc;
+    window._fbSignIn  = signInWithEmailAndPassword;
+    window._fbSignOut = signOut;
+    window._fbAuthStateChanged = onAuthStateChanged;
+    window._firebaseReady = true;
+    document.dispatchEvent(new Event('firebase-ready'));
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <script>if(location.protocol==='file:'){var _mf=document.querySelector('link[rel="manifest"]');if(_mf)_mf.remove();}</script>
+  <meta name="theme-color" content="#1b4332"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Generus Margosari"/>
+  <link rel="apple-touch-icon" href="icons/icon-180.png"/>
+  <link rel="stylesheet" href="css/base.css?v=22"/>
+  <link rel="stylesheet" href="css/layout.css?v=22"/>
+  <link rel="stylesheet" href="css/components.css?v=22"/>
+  <link rel="stylesheet" href="css/modules.css?v=22"/>
+  <link rel="stylesheet" href="css/theme.css?v=1"/>
+  
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <link rel="shortcut icon" href="favicon.png" type="image/png"/>
+  <meta property="og:title" content="Database Generus Margosari"/>
+  <meta property="og:description" content="Absensi, kas, dan rekap Generus Margosari."/>
+  <meta property="og:image" content="logo.png"/>
+</head>
+<body style="overscroll-behavior: none; touch-action: pan-y;">
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="ls-ambient ls-ambient-a"></div>
+  <div class="ls-ambient ls-ambient-b"></div>
+  <div class="ls-inner">
+    <div class="ls-showcase">
+      <div class="ls-glow"></div>
+      <svg class="ls-arch" fill="none" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M20 230 V115 C20 65 65 25 100 12 C135 25 180 65 180 115 V230" stroke="currentColor" stroke-dasharray="3 3" stroke-width="1.2"/>
+        <path d="M36 230 V122 C36 78 72 42 100 30 C128 42 164 78 164 122 V230" opacity="0.6" stroke="currentColor" stroke-width="0.8"/>
+        <circle cx="100" cy="12" fill="currentColor" r="2.5"/>
+        <path d="M100 4 V12" stroke="currentColor" stroke-width="1"/>
+      </svg>
+      <div class="ls-ring ls-ring-1">
+        <span class="ls-orb ls-orb-a"></span>
+        <span class="ls-orb ls-orb-b"></span>
+        <span class="ls-orb ls-orb-c"></span>
+        <span class="ls-orb ls-orb-d"></span>
+      </div>
+      <div class="ls-ring ls-ring-2">
+        <span class="ls-dot ls-dot-a"></span>
+        <span class="ls-dot ls-dot-b"></span>
+      </div>
+      <div class="ls-ring ls-ring-3"></div>
+      <div class="ls-logo-float">
+        <img src="logo.png" alt="Logo Database Generus Margosari"/>
+      </div>
+    </div>
+    <div class="ls-text">
+      <h1 class="ls-h1">Database Generus Margosari</h1>
+      <div class="ls-status">
+        <span class="ls-ping"></span>
+        <span id="loading-status">Menghubungkan ke server...</span>
+      </div>
+    </div>
+    <div class="ls-progress">
+      <div class="ls-track"><div class="ls-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="ls-meta">
+        <span class="ls-mosq"><i></i>Masjid Al-Haq</span>
+        <span class="ls-pct" id="progress-percent">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var fill = document.getElementById('progress-fill');
+  var percentText = document.getElementById('progress-percent');
+  var statusText = document.getElementById('loading-status');
+  if(!fill || !percentText || !statusText) return;
+  var current = 0;
+  window._lsPct = 0;
+  var TOTAL_DURATION = 4600;
+  var startTime = null;
+  var statusSteps = [
+    { at: 0, text: 'Menghubungkan ke server...' },
+    { at: 25, text: 'Memuat modul data generus...' },
+    { at: 55, text: 'Menyiapkan basis data...' },
+    { at: 82, text: 'Menyinkronkan data sistem...' },
+    { at: 96, text: 'Hampir siap...' },
+    { at: 100, text: 'Selesai! Selamat datang.' }
+  ];
+  function getStatusForPercent(pct){
+    for(var i = statusSteps.length - 1; i >= 0; i--){
+      if(pct >= statusSteps[i].at) return statusSteps[i].text;
+    }
+    return statusSteps[0].text;
+  }
+  function easeOutQuad(t){ return t * (2 - t); }
+  function frame(timestamp){
+    if(!document.getElementById('loading-screen')) return; // sudah masuk aplikasi
+    if(!startTime) startTime = timestamp;
+    var elapsed = timestamp - startTime;
+    var progressRatio = Math.min(elapsed / TOTAL_DURATION, 1);
+    var nextPercent = Math.min(100, Math.round(easeOutQuad(progressRatio) * 100));
+    if(nextPercent !== current){
+      current = nextPercent;
+      window._lsPct = current;
+      fill.style.width = current + '%';
+      percentText.textContent = current + '%';
+      var s = getStatusForPercent(current);
+      if(statusText.textContent !== s) statusText.textContent = s;
+    }
+    if(progressRatio < 1){
+      requestAnimationFrame(frame);
+    } else {
+      setTimeout(function(){
+        if(!document.getElementById('loading-screen')) return;
+        current = 0;
+        fill.style.width = '0%';
+        percentText.textContent = '0%';
+        statusText.textContent = statusSteps[0].text;
+        setTimeout(function(){
+          startTime = null;
+          requestAnimationFrame(frame);
+        }, 600);
+      }, 2400);
+    }
+  }
+  setTimeout(function(){ requestAnimationFrame(frame); }, 500);
+})();
+</script>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ico-home" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></symbol>
+  <symbol id="ico-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/></symbol>
+  <symbol id="ico-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="ico-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 9v6c0 1.66 4.03 3 9 3s9-1.34 9-3V9"/><path d="M3 15v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4"/></symbol>
+  <symbol id="ico-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="ico-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="ico-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ico-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ico-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="ico-reset" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></symbol>
+  <symbol id="ico-note" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="12" y2="17"/></symbol>
+  <symbol id="ico-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="ico-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ico-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="ico-home-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="ico-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="ico-money" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></symbol>
+  <symbol id="ico-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ico-trend-up" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+  <symbol id="ico-trend-down" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></symbol>
+  <symbol id="ico-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ico-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ico-absen-art" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="88" fill="currentColor" opacity="0.06"/>
+    <circle cx="100" cy="100" r="64" fill="currentColor" opacity="0.05"/>
+    <rect x="58" y="64" width="84" height="88" rx="18" fill="currentColor" opacity="0.22"/>
+    <rect x="77" y="48" width="46" height="30" rx="8" fill="currentColor" opacity="0.30"/>
+    <path d="M82 120 l14 14 22 -28" stroke="currentColor" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+    <circle cx="176" cy="44" r="5" fill="currentColor" opacity="0.4"/>
+    <circle cx="28" cy="72" r="4" fill="currentColor" opacity="0.32"/>
+    <circle cx="150" cy="170" r="4" fill="currentColor" opacity="0.32"/>
+  </symbol>
+</svg>
+
+<!-- LOGIN -->
+<div id="pg-login" class="login-lux">
+  <div class="login-bg" aria-hidden="true"><i class="login-blob login-blob-a"></i><i class="login-blob login-blob-b"></i></div>
+  <div class="login-center">
+    <div class="login-card">
+      <div class="login-brand">
+        <span class="login-logo"><img src="logo.png" alt="Logo Generus Margosari"/></span>
+        <h1>Database Generus <strong>Margosari</strong></h1>
+        <p>Sistem Informasi &amp; Manajemen Generasi Penerus.<br>Silakan masuk ke akun pengurus Anda.</p>
+        <div class="login-div"><span>Autentikasi Pengurus</span></div>
+      </div>
+      <div class="fr">
+        <label for="loginUser">Username / ID Pengurus</label>
+        <div class="login-input">
+          <span class="msym">person</span>
+          <input type="text" id="loginUser" placeholder="Masukkan username pengurus" onkeydown="loginEnter(event)" autocomplete="username"/>
+        </div>
+      </div>
+      <div class="fr" style="margin-bottom:8px">
+        <label for="loginPass">Kata Sandi</label>
+        <div class="login-input">
+          <span class="msym">lock</span>
+          <input type="password" id="loginPass" placeholder="Masukkan kata sandi akun" onkeydown="loginEnter(event)" autocomplete="current-password"/>
+          <button type="button" class="login-eye" onclick="toggleLoginPass()" aria-label="Tampilkan kata sandi"><span class="msym" id="loginEye">visibility</span></button>
+        </div>
+      </div>
+      <label class="remember-row"><input type="checkbox" id="rememberMe" checked/><span>Ingat saya di perangkat ini</span></label>
+      <div class="login-err" id="loginErr"></div>
+      <button class="btn-p btn-full login-submit" onclick="doLogin()">Masuk ke Database <span>→</span></button>
+    </div>
+    <div class="login-foot">&copy; 2026 Kepengurusan Muda-Mudi</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="pg-app" style="display:none">
+
+  <!-- PC -->
+  <div class="pc-shell pc-only">
+
+    <div class="sidebar">
+      <div class="sidebar-hd">
+        <div class="sidebar-hd-text">
+          <div class="sidebar-title">Database Generus<br>Margosari</div>
+          <div class="sidebar-date js-date"></div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-label">Menu</div>
+        <button class="si on" id="si-home" onclick="goPc('home')">
+          <svg class="ico si-icon"><use href="#ico-home"/></svg> Dashboard
+        </button>
+        <button class="si need-absen" id="si-absen" onclick="goPc('absen')">
+          <svg class="ico si-icon"><use href="#ico-clipboard"/></svg> Absensi
+        </button>
+        <button class="si" id="si-kas" onclick="goPc('kas')">
+          <svg class="ico si-icon"><use href="#ico-money"/></svg> Kas
+        </button>
+        <button class="si" id="si-rekap" onclick="goPc('rekap')">
+          <svg class="ico si-icon"><use href="#ico-chart"/></svg> Rekap
+        </button>
+        <button class="si need-admin" id="si-lainnya" onclick="goPc('lainnya')">
+          <svg class="ico si-icon"><use href="#ico-menu"/></svg> Lainnya
+        </button>
+      </nav>
+      <div id="pc-sync-badge" class="sync-badge sync-ok">Online</div>
+      <div class="user-info">
+        <div class="u-av js-uinit"></div>
+        <div style="flex:1;min-width:0">
+          <div class="u-nama js-uname"></div>
+          <div class="u-role js-urole"></div>
+          <select id="pc-group-switcher" onchange="switchGroup(this.value)" style="display:none;margin-top:4px;font-size:11px;width:100%;padding:3px 4px;border-radius:6px"></select>
+        </div>
+        <button onclick="doLogout()" title="Keluar" style="padding:5px 7px;border-color:transparent;background:none">
+          <svg class="ico" style="width:14px;height:14px"><use href="#ico-logout"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="pc-content">
+
+      <!-- HOME — Luxury PC (sama persis acuan) -->
+      <div class="pane on" id="pc-home">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Dashboard Utama</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+        </div>
+        <div class="pane-body lux-pc-body">
+          <div class="ndash-wrap lux-pc">
+            <!-- Hero Banner -->
+            <section class="lux-hero lux-hero-pc">
+              <div class="lux-hero-glow lux-glow-a" aria-hidden="true"></div>
+              <div class="lux-hero-glow lux-glow-b" aria-hidden="true"></div>
+              <div class="lux-hero-cols">
+                <div class="lux-hero-main">
+                  <span class="lux-date-pill"><span class="msym" style="font-size:14px;color:#ffdcbd">calendar_today</span><span class="js-date"></span></span>
+                  <h2 class="lux-greet lux-greet-pc"><span id="dash-welcome-greet">Selamat Pagi</span>, <em id="dash-welcome-name">Admin</em></h2>
+                </div>
+              </div>
+              <div class="lux-micro">
+                <span><span class="lux-mdot" style="background:#f0bd8b"></span>Kas Aktif: <strong id="lux-kas-pc">—</strong></span>
+                <span class="lux-dot-sep">•</span>
+                <span><span class="lux-mdot" style="background:#52b788"></span><span id="lux-sesi-pc">—</span></span>
+              </div>
+            </section>
+
+            <!-- 4 Metrik -->
+            <section>
+              <div class="sec-lbl-row lux-sec-row"><span class="sec-lbl" style="display:inline-flex;align-items:center;gap:8px"><span class="msym" style="font-size:18px;color:#1b4332">analytics</span>Ringkasan Bulan Ini <span id="lux-bulan-pc"></span></span><span class="lux-bulan-lbl">Update real-time</span></div>
+              <div class="kpi-grid">
+                <div class="kpi-card">
+                  <div class="kpi-ic" style="background:#ebf5f0;color:#1b4332">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                  </div>
+                  <div class="kpi-info">
+                    <span class="kpi-lbl">Total Generus</span>
+                    <div class="kpi-val-row"><span class="kpi-val" id="dash-generus-pc">—</span><span class="kpi-unit">Anggota</span></div>
+                  </div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-ic" style="background:#ebf5f0;color:#1b4332">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                  </div>
+                  <div class="kpi-info">
+                    <span class="kpi-lbl">Kegiatan Bulan Ini</span>
+                    <div class="kpi-val-row"><span class="kpi-val" id="dash-kegiatan-pc">—</span><span class="kpi-unit">Sesi</span></div>
+                  </div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-ic" style="background:#fef3c7;color:#b45309">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                  </div>
+                  <div class="kpi-info">
+                    <span class="kpi-lbl">Rasio Kehadiran</span>
+                    <div class="kpi-val-row"><span class="kpi-val" id="dash-persen-pc">—</span><span class="kpi-unit">Rata-rata</span></div>
+                  </div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-ic" style="background:#ebf5f0;color:#2d6a4f">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <div class="kpi-info">
+                    <span class="kpi-lbl">Total Berangkat</span>
+                    <div class="kpi-val-row"><span class="kpi-val" id="dash-hadir-pc">—</span><span class="kpi-unit">Orang-Sesi</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Chart + Recent -->
+            <section class="lux-grid-8-4">
+              <article class="ndash-mob-card lux-card">
+                <div class="ndash-sec-hd lux-sec-hd">
+                  <div><div style="font-size:14px">Grafik Kehadiran &amp; Partisipasi</div><div class="lux-chart-sub" id="lux-chart-sub-pc" style="padding:2px 0 0">Analisis tren kehadiran tiap sesi</div></div>
+                  <div class="lux-filter-pills"><button class="on">Bulan Ini</button><button onclick="goPc('rekap')">3 Bulan</button><button onclick="goPc('rekap')">Tahun Ini</button></div>
+                </div>
+                <div class="lux-legend-box">
+                  <span class="lux-legend-title">Keterangan:</span>
+                  <span><span class="nleg-dot" style="background:#2d6a4f"></span>Hadir (Total <b id="lux-leg-h-pc">0</b>)</span>
+                  <span><span class="nleg-dot" style="background:#b45309"></span>Izin (Total <b id="lux-leg-i-pc">0</b>)</span>
+                  <span><span class="nleg-dot" style="background:#ba1a1a"></span>Alpa (Total <b id="lux-leg-a-pc">0</b>)</span>
+                </div>
+                <div id="dash-chart-pc" class="ndash-chart-wrap"></div>
+                <div class="lux-note" id="lux-chart-note-pc"></div>
+              </article>
+              <article class="ndash-mob-card lux-card">
+                <div class="ndash-sec-hd lux-sec-hd"><span style="display:inline-flex;align-items:center;gap:8px"><span class="msym" style="font-size:19px;color:#1b4332">history_edu</span>Kegiatan Terbaru</span><button onclick="goPc('absen')" class="ndash-see-all">Lihat Semua ›</button></div>
+                <div id="dash-recent-pc"></div>
+                <div class="lux-foot-btn"><button class="lux-outline-btn" onclick="goPc('absen')"><span class="msym" style="font-size:16px;vertical-align:-3px">format_list_bulleted</span> Buka Rekap Seluruh Pertemuan</button></div>
+              </article>
+            </section>
+
+            <!-- Kas -->
+            <section class="ndash-mob-card lux-card">
+              <div class="ndash-sec-hd lux-sec-hd lux-kas-hd">
+                <div><div style="font-size:14px;display:flex;align-items:center;gap:8px"><span class="msym" style="font-size:20px;color:#1b4332">payments</span>Ringkasan Kas &amp; Arus Dana</div><div class="lux-chart-sub" id="lux-kas-sub-pc" style="padding:2px 0 0">Keuangan kas periode berjalan</div></div>
+              </div>
+              <div id="dash-kas-pc"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABSENSI -->
+      <div class="pane" id="pc-absen" style="overflow:hidden">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Absensi &amp; Presensi Kegiatan</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+          <button id="pc-btn-selesai" onclick="selesaiAbsensi()" class="btn-p tb-btn" style="display:none">✓ Selesai</button>
+        </div>
+
+        <!-- STATE 1: Hero + pilih tanggal/nama kegiatan + riwayat sesi -->
+        <div id="pc-absen-setup" class="absen-list-wrap abs-lux" style="overflow-y:auto;overscroll-behavior:none">
+
+          <!-- STAGE 1: Hero + riwayat sesi -->
+          <div id="pc-stage-hero">
+            <section class="abs-hero">
+              <div class="abs-hero-glow abs-glow-a" aria-hidden="true"></div>
+              <div class="abs-hero-glow abs-glow-b" aria-hidden="true"></div>
+              <div class="abs-hero-cols">
+                <div class="abs-hero-main">
+                  <span class="lux-date-pill"><span class="msym" style="font-size:14px;color:#a5d0b9">calendar_today</span><span class="js-date"></span></span>
+                  <h2 class="abs-hero-title">Mulai Absensi</h2>
+                  <p class="abs-hero-desc">Pilih tanggal dan nama kegiatan untuk mengisi presensi.</p>
+                  <div class="abs-hero-actions">
+                    <button class="abs-hero-btn" onclick="showAbsenMain()">Mulai Absensi <span>→</span></button>
+                  </div>
+                </div>
+                <div class="abs-hero-side">
+                  <div class="abs-hero-stats">
+                    <div><strong><span id="abs-hero-sesi-pc">—</span> Sesi</strong><span>Tercatat di Database</span></div>
+                    <div><strong><span id="abs-hero-gen-pc">—</span> Generus</strong><span>Total Kapasitas Absensi</span></div>
+                  </div>
+                  <div class="abs-hero-badge">
+                    <span class="abs-badge-clip"><span class="msym" style="font-size:24px">fact_check</span></span>
+                    <span class="abs-badge-tag">Siap Mulai</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="abs-toolbar">
+              <div class="abs-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                <input id="dbSearch" placeholder="Cari sesi atau tanggal kegiatan..." oninput="renderDb()"/>
+              </div>
+              <div class="abs-filters">
+                <span class="abs-filter-lbl">Filter:</span>
+                <select id="dbFilterBulan" onchange="renderDb()">
+                  <option value="">Semua Bulan</option>
+                  <option value="01">Januari</option><option value="02">Februari</option>
+                  <option value="03">Maret</option><option value="04">April</option>
+                  <option value="05">Mei</option><option value="06">Juni</option>
+                  <option value="07">Juli</option><option value="08">Agustus</option>
+                  <option value="09">September</option><option value="10">Oktober</option>
+                  <option value="11">November</option><option value="12">Desember</option>
+                </select>
+                <select id="dbFilterTahun" onchange="renderDb()">
+                  <option value="">Semua Tahun</option>
+                  <option value="2026">2026</option><option value="2027">2027</option>
+                  <option value="2028">2028</option><option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+                <select id="dbSort" onchange="renderDb()">
+                  <option value="desc">Terbaru Dulu</option>
+                  <option value="asc">Terlama Dulu</option>
+                </select>
+              </div>
+            </section>
+            <div class="abs-sec-hd">
+              <span class="abs-sec-title">Riwayat Sesi</span>
+              <span class="abs-sec-dot"></span>
+              <span id="sesiFilterArrowPc" style="display:none"></span>
+              <span class="abs-sec-note">Urutan Kronologis Terbaru</span>
+            </div>
+            <div id="sesiFilterRowPc" style="display:none"></div>
+            <div id="dbList" class="abs-list"><div class="empty">Belum ada sesi.</div></div>
+            <footer class="abs-foot"><span id="abs-foot-pc">Menampilkan 0 sesi</span><span>•</span><strong>Tersimpan di Cloud</strong></footer>
+          </div>
+
+          <!-- STAGE 2: pilih tanggal + nama kegiatan saja -->
+          <div id="pc-stage-main" style="display:none">
+            <button class="stage-back" onclick="showAbsenHero()">← Kembali</button>
+            <div class="abs-form" id="absen-newbox-pc">
+              <div class="abs-form-hd">
+                <span>Mulai Absensi Baru</span>
+                <span class="abs-form-ic"><span class="msym" style="font-size:18px">calendar_today</span></span>
+              </div>
+              <div class="abs-form-body">
+                <div class="fr" style="margin:0"><label>Tanggal Kegiatan</label><input type="date" id="sTgl"/></div>
+                <div class="fr" style="margin:0"><label>Nama Kegiatan</label><input type="text" id="sKet" placeholder="cth: Pengajian Rutin..." onkeydown="if(event.key==='Enter')mulaiAbsensi(false)"/></div>
+                <button class="abs-hero-btn" onclick="mulaiAbsensi(false)" style="align-self:flex-end;white-space:nowrap">Tampilkan Daftar →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE 2: Attendance List -->
+        <div id="pc-absen-body" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+          <div style="padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);flex-shrink:0;background:var(--bg2);display:flex;align-items:center;gap:8px">
+            <span id="pc-absen-date" onclick="openEditSesiPopup()" title="Klik untuk edit tanggal/kegiatan" style="flex:1;cursor:pointer"></span>
+          </div>
+          <div id="pc-bulk-bar" style="display:none;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:8px">
+            <span id="pc-bulk-count" style="font-size:12px;font-weight:600;color:var(--gold-dk);flex:1">0 dipilih</span>
+            <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 12px;font-size:12px">✓ Hadir</button>
+            <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 12px;font-size:12px">? Izin</button>
+            <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 12px;font-size:12px">✕ Alfa</button>
+            <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 12px;font-size:12px">Batal</button>
+          </div>
+          <div class="counter-bar" id="pc-absen-ctr" style="flex-shrink:0"></div>
+          <div class="pc-2col" style="flex:1">
+            <div><div class="col-hd">Perempuan</div><div id="pc-col-p"></div></div>
+            <div><div class="col-hd">Laki-laki</div><div id="pc-col-l"></div></div>
+          </div>
+          <div class="selesai-bar">
+            <div class="selesai-bar-info" id="pc-selesai-info"></div>
+            <button class="btn-p" onclick="selesaiAbsensi()" style="padding:9px 20px">✓ Selesai &amp; Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REKAP -->
+      <div class="pane" id="pc-rekap">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Rekap Kehadiran &amp; Statistik</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+          <span class="rekap-periode-chip" id="rekap-periode-lbl">Bulan Berjalan</span>
+        </div>
+        <div class="pane-body rekap-lux">
+          <div class="rekap-lux-wrap">
+            <div class="rekap-head">
+              <div class="rekap-head-main">
+                <span class="rekap-date-pill"><span class="lux-sync-dot"></span><span class="js-date"></span> • Periode Berjalan</span>
+                <h2 class="rekap-title">Rekap &amp; Statistik Kehadiran</h2>
+              </div>
+              <div class="rekap-head-filters">
+                <select id="rBulan" onchange="renderRekap('pc')" aria-label="Pilih Bulan">
+                  <option value="1">Bulan: Januari</option><option value="2">Bulan: Februari</option><option value="3">Bulan: Maret</option>
+                  <option value="4">Bulan: April</option><option value="5">Bulan: Mei</option><option value="6">Bulan: Juni</option>
+                  <option value="7">Bulan: Juli</option><option value="8">Bulan: Agustus</option><option value="9">Bulan: September</option>
+                  <option value="10">Bulan: Oktober</option><option value="11">Bulan: November</option><option value="12">Bulan: Desember</option>
+                </select>
+                <select id="rTahun" onchange="renderRekap('pc')" aria-label="Pilih Tahun">
+                  <option value="2026" selected>Tahun: 2026</option><option value="2027">Tahun: 2027</option>
+                  <option value="2028">Tahun: 2028</option><option value="2029">Tahun: 2029</option><option value="2030">Tahun: 2030</option>
+                </select>
+                <select id="rGender" onchange="renderRekap('pc')" style="display:none">
+                  <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+                </select>
+                <select id="rSort" onchange="renderRekap('pc')" style="display:none">
+                  <option value="asc">Terlama Dulu</option>
+                  <option value="desc">Terbaru Dulu</option>
+                </select>
+                <span id="rekapFilterArrowPc" style="display:none"></span>
+                <div id="rekapFilterRowPc" style="display:none"></div>
+              </div>
+            </div>
+            <div id="rekapStats"></div>
+            <section class="rekap-matrix-card">
+              <div class="rekap-matrix-hd">
+                <div class="rekap-matrix-title">
+                  <h3>Matriks Presensi Lengkap Generus <span class="rekap-sesi-pill" id="rekap-sesi-pill">0 Sesi</span></h3>
+                  <p>Daftar kehadiran rinci per sesi kegiatan dan persentase kehadiran bulanan</p>
+                </div>
+                <div class="rekap-matrix-tools">
+                  <div class="rekap-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                    <input id="rSearch" placeholder="Cari nama generus..." oninput="renderRekap('pc')"/>
+                  </div>
+                  <div class="rekap-seg" id="rSegPc">
+                    <button data-g="S" class="on" onclick="rekapSetGender('pc','S')">Semua</button>
+                    <button data-g="P" onclick="rekapSetGender('pc','P')">Perempuan</button>
+                    <button data-g="L" onclick="rekapSetGender('pc','L')">Laki-Laki</button>
+                  </div>
+                  <select id="rSortV" class="rekap-sort-sel" onchange="document.getElementById('rSort').value=this.value;renderRekap('pc')" aria-label="Urutan">
+                    <option value="asc">Terlama Dulu</option>
+                    <option value="desc">Terbaru Dulu</option>
+                  </select>
+                </div>
+              </div>
+              <div class="scroll-x"><table class="rekap-tbl-x"><thead id="theadRekap"></thead><tbody id="tbodyRekap"></tbody></table></div>
+              <div class="rekap-matrix-foot"><span><strong>Keterangan:</strong> H = Hadir &nbsp; I = Izin (Kerja, Sakit, Kuliah, Acara) &nbsp; A = Alfa / Tanpa Keterangan</span><span id="rekap-foot-pc"></span></div>
+            </section>
+            <div id="izinSheet"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KAS -->
+      <div class="pane" id="pc-kas">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Kelola Kas &amp; Keuangan</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+        </div>
+        <!-- Hidden stat IDs to keep JS working -->
+        <span id="ks-saldo" style="display:none"></span><span id="ks-masuk" style="display:none"></span><span id="ks-keluar" style="display:none"></span><span id="ks-selisih" style="display:none"></span><span id="ks-masuk-sub" style="display:none"></span><span id="ks-keluar-sub" style="display:none"></span><span id="ks-selisih-sub" style="display:none"></span>
+        <span id="kasCfPeriodeLabel" style="display:none"></span><span id="kasCfPeriodeLabelM" style="display:none"></span>
+        <div class="pane-body kas-lux">
+          <div id="kasStatGrid" style="display:none"></div>
+          <div class="kas-lux-wrap">
+
+          <!-- Hero -->
+          <section class="kas-hero">
+            <div class="kas-hero-glow" aria-hidden="true"></div>
+            <div class="kas-hero-cols">
+              <div class="kas-hero-main">
+                <span class="kas-hero-date"><span class="msym" style="font-size:15px">calendar_today</span><span class="js-date"></span></span>
+                <h2 class="kas-hero-title">Kelola Kas</h2>
+                <p class="kas-hero-desc">Catat pemasukan dan pengeluaran kas.</p>
+                <button class="kas-hero-btn" onclick="openKasTambah()"><span style="font-size:18px;line-height:1">+</span> Tambah Transaksi</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Cash Flow + Donut Row -->
+          <div class="kas-cf-donut-row">
+
+            <!-- Cash Flow Card -->
+            <div class="kas-cf-card">
+              <div class="kas-cf-hd">
+                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+                  <span class="msym" style="font-size:17px;color:#717973">calendar_today</span>
+                  <span class="kas-cf-title">Cash Flow — Periode</span>
+                </div>
+                <div class="kas-cf-filters">
+                  <select id="kasBulan" onchange="renderKas()">
+                    <option value="01">Januari</option><option value="02">Februari</option>
+                    <option value="03">Maret</option><option value="04">April</option>
+                    <option value="05">Mei</option><option value="06">Juni</option>
+                    <option value="07">Juli</option><option value="08">Agustus</option>
+                    <option value="09">September</option><option value="10">Oktober</option>
+                    <option value="11">November</option><option value="12">Desember</option>
+                  </select>
+                  <select id="kasTahun" onchange="renderKas()">
+                    <option value="2025">2025</option><option value="2026" selected>2026</option>
+                    <option value="2027">2027</option><option value="2028">2028</option>
+                    <option value="2029">2029</option><option value="2030">2030</option>
+                  </select>
+                </div>
+              </div>
+              <div id="kasCfBody">
+                <div class="kas-cf-row" style="align-items:center">
+                  <div class="kas-cf-row-icon" style="background:#e8e6df;color:#4b5563">
+                    <span class="msym" style="font-size:17px">wallet</span>
+                  </div>
+                  <span class="kas-cf-row-label">Saldo Awal</span>
+                  <span class="kas-cf-row-val" id="cf-saldo-awal" style="color:#1f2937">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:rgba(209,250,229,.6);color:#006c48">
+                    <span class="msym" style="font-size:17px">trending_up</span>
+                  </div>
+                  <span class="kas-cf-row-label">Total Pemasukan</span>
+                  <span class="kas-cf-row-val kas-masuk" id="cf-pemasukan">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:rgba(254,226,226,.7);color:#ba1a1a">
+                    <span class="msym" style="font-size:17px">trending_down</span>
+                  </div>
+                  <span class="kas-cf-row-label">Total Pengeluaran</span>
+                  <span class="kas-cf-row-val kas-keluar" id="cf-pengeluaran">Rp0</span>
+                </div>
+                <div class="kas-cf-row">
+                  <div class="kas-cf-row-icon" style="background:#e8e6df;color:#4b5563">
+                    <span class="msym" style="font-size:17px">schedule</span>
+                  </div>
+                  <span class="kas-cf-row-label">Selisih</span>
+                  <span class="kas-cf-row-val" id="cf-selisih">Rp0</span>
+                </div>
+                <div class="kas-cf-saldo-akhir">
+                  <span class="kas-cf-saldo-akhir-lbl">Saldo Akhir</span>
+                  <span class="kas-cf-saldo-akhir-val" id="cf-saldo-akhir">Rp0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Donut Card -->
+            <div class="kas-donut-card">
+              <div class="kas-donut-ttl">Komposisi Periode</div>
+              <div id="kasDonutSvg" style="display:flex;justify-content:center;align-items:center;flex:1"></div>
+              <div id="kasDonutLegend"></div>
+            </div>
+
+          </div><!-- end kas-cf-donut-row -->
+
+          <!-- Line Chart Card (PC) -->
+          <div class="kas-line-card">
+            <div class="kas-line-hd">
+              <span class="kas-line-title">Tren Pemasukan &amp; Pengeluaran</span>
+              <span class="kas-line-yr" id="kasLineYear">—</span>
+              <div class="kas-line-legend">
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#1b4332"></span>Pemasukan</span>
+                <span class="kas-line-leg"><span class="kas-line-dot" style="background:#ba1a1a"></span>Pengeluaran</span>
+              </div>
+            </div>
+            <div class="kas-line-body"><div id="kasLineChart"></div></div>
+          </div>
+
+          <!-- Transaction Table -->
+          <div class="kas-tbl-card">
+            <div class="kas-tbl-hd">
+              <span class="kas-tbl-title" id="kasTblTitle">TRANSAKSI PERIODE</span>
+            </div>
+            <div class="scroll-x">
+              <div class="kas-tgrid-hd"><span>Tanggal</span><span>Keterangan</span><span class="r">Masuk</span><span class="r">Keluar</span><span class="r">Saldo</span></div>
+              <div id="kasTblBody"></div>
+            </div>
+          </div>
+          <footer class="kas-foot"><span>Menampilkan transaksi kas periode terpilih</span><span>•</span><strong>Tersimpan di Cloud</strong><span class="kas-foot-right"><span class="js-grpname">Muda-Mudi</span> Margosari © 2026</span></footer>
+          </div><!-- end kas-lux-wrap -->
+        </div>
+      </div>
+
+      <!-- ANGGOTA -->
+      <div class="pane" id="pc-anggota">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Anggota</span>
+          <button class="btn-p tb-btn" onclick="openAddAnggotaPopup()">+ Tambah</button>
+        </div>
+        <div class="toolbar" style="flex-shrink:0">
+          <input id="srchA" placeholder="Cari nama..." style="flex:1" oninput="renderAnggota()"/>
+          <select id="srchFilterA" onchange="renderAnggota()" style="max-width:110px">
+            <option value="">Semua Status</option>
+            <option value="Aktif">Aktif</option>
+            <option value="Arsip">Arsip</option>
+          </select>
+        </div>
+        <div class="pane-body" id="anggotaList"></div>
+      </div>
+
+      <!-- LAINNYA -->
+      <div class="pane" id="pc-lainnya">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Lainnya</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+        </div>
+        <div class="pane-body lain-lux">
+          <div class="lain-lux-wrap">
+            <section class="lain-profile">
+              <span class="lain-avatar"><span class="js-uinit">A</span><i></i></span>
+              <div class="lain-profile-info">
+                <div class="lain-profile-name"><span class="js-uname">Administrator</span><span class="lain-super">Super Admin</span></div>
+                <div class="lain-profile-role js-urole">Admin Utama</div>
+                <p class="lain-last">Terakhir aktif: Hari ini • <span class="js-date"></span></p>
+              </div>
+            </section>
+            <section class="lain-grid">
+              <button class="lain-card" onclick="openActivityLog()">
+                <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">schedule</span></span>
+                <span><span class="lain-name">Log Aktivitas</span><span class="lain-sub">Riwayat aktivitas semua pengguna, presensi, &amp; kas</span></span></span>
+                <span class="lain-go">›</span>
+              </button>
+              <button class="lain-card" onclick="goPc('anggota')">
+                <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">groups</span></span>
+                <span><span class="lain-name">Anggota <span class="lain-mini" id="lain-jml-pc">26 Aktif</span></span><span class="lain-sub">Kelola data anggota muda-mudi, arsip &amp; status</span></span></span>
+                <span class="lain-go">›</span>
+              </button>
+              <button class="lain-card" onclick="goPc('ekspor')">
+                <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">download</span></span>
+                <span><span class="lain-name">Ekspor Data</span><span class="lain-sub">Rekap kehadiran, buku kas, dan anggota (Excel/PDF)</span></span></span>
+                <span class="lain-go">›</span>
+              </button>
+              <button class="lain-card" onclick="goPc('tentang')">
+                <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">info</span></span>
+                <span><span class="lain-name">Tentang Aplikasi <span class="lain-mini lain-mini-grey">v4.0</span></span><span class="lain-sub">Informasi sistem &amp; panduan penggunaan</span></span></span>
+                <span class="lain-go">›</span>
+              </button>
+            </section>
+            <section>
+              <button class="lain-card lain-logout" onclick="doLogout()">
+                <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">logout</span></span>
+                <span><span class="lain-name">Logout</span><span class="lain-sub">Keluar dari sesi akun pada perangkat ini</span></span></span>
+                <span class="lain-go">›</span>
+              </button>
+            </section>
+            <footer class="lain-foot"><span><span class="js-grpname">Muda-Mudi</span> Margosari © 2026 • Sistem Manajemen Kehadiran &amp; Kas Generus</span><span class="lain-foot-r"><i></i>Sinkronisasi cloud aktif</span></footer>
+          </div>
+        </div>
+      </div>
+
+      <!-- TENTANG APLIKASI -->
+      <div class="pane" id="pc-tentang">
+        <div class="pc-topbar">
+          <span class="pc-topbar-title">Tentang Aplikasi</span>
+          <button class="tb-btn" onclick="goPc('lainnya')">← Kembali</button>
+        </div>
+        <div class="pane-body" style="background:#fbf9f6">
+          <div class="tentang-wrap">
+
+            <!-- Header -->
+            <div class="tentang-hero">
+              <div class="tentang-hero-ic"><svg class="ico"><use href="#ico-info"/></svg></div>
+              <div class="tentang-hero-info">
+                <div class="tentang-hero-title">Tentang Aplikasi</div>
+                <div class="tentang-hero-sub">Informasi dan panduan penggunaan aplikasi</div>
+              </div>
+            </div>
+
+            <!-- Tentang -->
+            <div class="tentang-card">
+              <div class="tentang-card-hd">Tentang Aplikasi</div>
+              <p class="tentang-text">Aplikasi ini membantu pengelolaan data generus Margosari — mulai dari data anggota, absensi, kas, rekap kegiatan, hingga aktivitas pengguna, arsip data, dan ekspor data — dalam satu tempat yang rapi dan mudah diakses. Khusus akun Caberawit, anggota dikelompokkan per kelas (PAUD, Tilawati 1–6, Al-Quran) dan ditampilkan urut per kelas di menu Anggota, Absensi, dan Rekap.</p>
+              <div class="tentang-points">
+                <span class="tentang-point"><svg class="ico"><use href="#ico-users"/></svg> Data anggota</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-clipboard"/></svg> Absensi</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-wallet"/></svg> Kas</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-chart"/></svg> Rekap kegiatan</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-clock"/></svg> Aktivitas pengguna</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-db"/></svg> Arsip data</span>
+                <span class="tentang-point"><svg class="ico"><use href="#ico-download"/></svg> Ekspor data</span>
+              </div>
+            </div>
+
+            <!-- Fitur Utama -->
+            <div class="tentang-sec-title">Fitur Utama</div>
+            <div class="tentang-features">
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                <span class="tentang-feat-name">Absensi</span>
+                <span class="tentang-feat-sub">Mencatat dan memantau kehadiran anggota.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                <span class="tentang-feat-name">Kas</span>
+                <span class="tentang-feat-sub">Mengelola pemasukan, pengeluaran, dan saldo kas.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span>
+                <span class="tentang-feat-name">Anggota</span>
+                <span class="tentang-feat-sub">Mengelola data anggota aktif maupun arsip.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span>
+                <span class="tentang-feat-name">Rekap</span>
+                <span class="tentang-feat-sub">Melihat ringkasan dan statistik data.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-clock"/></svg></span>
+                <span class="tentang-feat-name">Log Aktivitas</span>
+                <span class="tentang-feat-sub">Melihat riwayat aktivitas pengguna.</span>
+              </div>
+              <div class="tentang-feat nd-card">
+                <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                <span class="tentang-feat-name">Ekspor</span>
+                <span class="tentang-feat-sub">Mengunduh atau mengekspor data yang diperlukan.</span>
+              </div>
+            </div>
+
+            <!-- Cara Menggunakan -->
+            <div class="tentang-sec-title">Cara Menggunakan</div>
+            <div class="tentang-guide">
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                  <span class="tentang-guide-name">Absensi</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Absensi</b> → klik <b>Mulai Absensi</b>.</li>
+                  <li>Pilih <b>tanggal</b> dan isi <b>nama kegiatan</b> → klik <b>Tampilkan Daftar</b>.</li>
+                  <li>Isi status tiap anggota dengan menekan tombol status (<b>Hadir / Izin / Alfa</b>).</li>
+                  <li>Mau isi banyak sekaligus? <b>Tahan nama anggota</b> hingga muncul mode pilih banyak, centang nama-namanya, lalu pilih statusnya.</li>
+                  <li>Setelah selesai, klik <b>Selesai &amp; Simpan</b>.</li>
+                  <li>Mengubah/mengisi ulang: <b>klik kegiatan</b> di daftar <b>Riwayat Sesi</b>. Menghapus sesi: <b>geser ke kiri</b> pada kegiatannya.</li>
+                </ol>
+              </div>
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                  <span class="tentang-guide-name">Kas</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Kas</b> → klik <b>+ Tambah Transaksi</b>.</li>
+                  <li>Isi <b>nominal</b>, pilih jenis <b>Masuk / Keluar</b>, isi <b>keterangan</b>, dan tentukan <b>tanggal</b>.</li>
+                  <li>Simpan transaksi.</li>
+                  <li>Mengubah transaksi: <b>klik</b> transaksinya. Menghapus: <b>geser ke kiri</b> pada transaksinya.</li>
+                </ol>
+              </div>
+
+              <div class="tentang-guide-card nd-card">
+                <div class="tentang-guide-hd">
+                  <span class="tentang-guide-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                  <span class="tentang-guide-name">Ekspor</span>
+                </div>
+                <ol class="tentang-guide-list">
+                  <li>Buka menu <b>Ekspor</b>.</li>
+                  <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
+                  <li>Pilih <b>periode</b> (Bulan / Tahun / Custom) dan jenis kelamin bila perlu, lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                  <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
+                </ol>
+              </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="tentang-foot">Dibuat untuk membantu pengelolaan data secara lebih mudah, cepat, dan terorganisir.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EKSPOR -->
+      <div class="pane" id="pc-ekspor">
+        <div class="pc-topbar lux-topbar">
+          <nav class="lux-crumb"><span class="lux-crumb-dim js-grpname">Muda-Mudi</span><span class="lux-crumb-sep">/</span><span class="lux-crumb-cur">Lainnya / Ekspor</span></nav>
+          <span class="lux-sync"><span class="lux-sync-dot"></span>Sinkronisasi Otomatis</span>
+        </div>
+        <div class="pane-body exp-lux">
+          <div class="exp-lux-wrap">
+            <div class="exp-lux-head">
+              <h2>Ekspor &amp; Unduh Laporan</h2>
+              <p>Unduh rekap kehadiran, laporan kas, dan data anggota (Excel, CSV, Print).</p>
+            </div>
+            <article class="exp-card">
+              <div class="exp-card-hd">
+                <span class="exp-card-main"><span class="exp-card-ic" style="background:#ebf5f0;color:#1b4332"><span class="msym" style="font-size:22px">bar_chart</span></span>
+                <span><span class="exp-card-title">Rekap Absensi Bulanan</span><span class="exp-card-desc">Ekspor riwayat dan persentase kehadiran generus per sesi pertemuan.</span></span></span>
+                <span class="exp-card-tag" style="background:#ebf5f0;color:#1b4332;border-color:#c1ecd4">Absensi Generus</span>
+              </div>
+              <div class="exp-card-body">
+                <label class="exp-lbl">Periode &amp; Parameter</label>
+                <div class="exp-grid">
+                  <select id="exRekapPeriode" class="exp-full" onchange="exPeriodeChanged('rekap')">
+                    <option value="bulan" selected>Bulan tertentu</option>
+                    <option value="tahun">Tahun tertentu</option>
+                    <option value="custom">Custom...</option>
+                    <option value="semua">Semua data</option>
+                  </select>
+                  <span id="exRekapBulanRow" class="exp-row2">
+                    <span id="exRekapBulanWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exRekapBulan" style="width:100%">
+                        <option value="01">Januari</option><option value="02">Februari</option>
+                        <option value="03">Maret</option><option value="04">April</option>
+                        <option value="05">Mei</option><option value="06">Juni</option>
+                        <option value="07">Juli</option><option value="08">Agustus</option>
+                        <option value="09">September</option><option value="10">Oktober</option>
+                        <option value="11">November</option><option value="12">Desember</option>
+                      </select>
+                    </span>
+                    <span id="exRekapTahunWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exRekapTahun" style="width:100%">
+                        <option value="2025">2025</option><option value="2026">2026</option>
+                        <option value="2027">2027</option><option value="2028">2028</option>
+                        <option value="2029">2029</option><option value="2030">2030</option>
+                      </select>
+                    </span>
+                  </span>
+                  <span class="exp-row2" id="exRekapCustom" style="display:none">
+                    <input type="date" id="exRekapDari" style="flex:1;min-width:0">
+                    <span class="exp-sep">—</span>
+                    <input type="date" id="exRekapSampai" style="flex:1;min-width:0">
+                  </span>
+                  <select id="exRekapGender">
+                    <option value="S">Semua</option><option value="P">Khusus Perempuan Saja</option><option value="L">Khusus Laki-laki Saja</option>
+                  </select>
+                </div>
+                <div class="exp-actions">
+                  <button class="exp-btn" onclick="eksporRekap('excel')"><span class="msym" style="font-size:16px;color:#006c48">description</span>Excel (.xlsx)</button>
+                  <button class="exp-btn" onclick="eksporRekap('csv')"><span class="msym" style="font-size:16px;color:#717973">draft</span>CSV</button>
+                  <button class="exp-btn" onclick="eksporRekap('print')"><span class="msym" style="font-size:16px;color:#717973">print</span>Print</button>
+                </div>
+              </div>
+            </article>
+            <article class="exp-card">
+              <div class="exp-card-hd">
+                <span class="exp-card-main"><span class="exp-card-ic" style="background:#ebf5f0;color:#006c48"><span class="msym" style="font-size:22px">account_balance_wallet</span></span>
+                <span><span class="exp-card-title">Laporan Kas</span><span class="exp-card-desc">Ekspor rekap arus pemasukan, pengeluaran kas, serta saldo per periode.</span></span></span>
+                <span class="exp-card-tag" style="background:#ebf5f0;color:#006c48;border-color:#c1ecd4">Keuangan Kas</span>
+              </div>
+              <div class="exp-card-body">
+                <label class="exp-lbl">Periode Pembukuan</label>
+                <div class="exp-grid">
+                  <select id="exKasPeriode" class="exp-full" onchange="exPeriodeChanged('kas')">
+                    <option value="bulan" selected>Bulan tertentu</option>
+                    <option value="tahun">Tahun tertentu</option>
+                    <option value="custom">Custom...</option>
+                    <option value="semua">Semua data</option>
+                  </select>
+                  <span id="exKasBulanRow" class="exp-row2">
+                    <span id="exKasBulanWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exKasBulan" style="width:100%">
+                        <option value="01">Januari</option><option value="02">Februari</option>
+                        <option value="03">Maret</option><option value="04">April</option>
+                        <option value="05">Mei</option><option value="06">Juni</option>
+                        <option value="07">Juli</option><option value="08">Agustus</option>
+                        <option value="09">September</option><option value="10">Oktober</option>
+                        <option value="11">November</option><option value="12">Desember</option>
+                      </select>
+                    </span>
+                    <span id="exKasTahunWrap" style="flex:1;display:flex;min-width:0">
+                      <select id="exKasTahun" style="width:100%">
+                        <option value="2025">2025</option><option value="2026">2026</option>
+                        <option value="2027">2027</option><option value="2028">2028</option>
+                        <option value="2029">2029</option><option value="2030">2030</option>
+                      </select>
+                    </span>
+                  </span>
+                  <span class="exp-row2" id="exKasCustom" style="display:none">
+                    <input type="date" id="exKasDari" style="flex:1;min-width:0">
+                    <span class="exp-sep">—</span>
+                    <input type="date" id="exKasSampai" style="flex:1;min-width:0">
+                  </span>
+                </div>
+                <div class="exp-actions">
+                  <button class="exp-btn" onclick="eksporKas('excel')"><span class="msym" style="font-size:16px;color:#006c48">description</span>Excel (.xlsx)</button>
+                  <button class="exp-btn" onclick="eksporKas('csv')"><span class="msym" style="font-size:16px;color:#717973">draft</span>CSV</button>
+                  <button class="exp-btn" onclick="eksporKas('print')"><span class="msym" style="font-size:16px;color:#717973">print</span>Print</button>
+                </div>
+              </div>
+            </article>
+            <article class="exp-card">
+              <div class="exp-card-hd">
+                <span class="exp-card-main"><span class="exp-card-ic" style="background:#fef3c7;color:#92400e"><span class="msym" style="font-size:22px">download</span></span>
+                <span><span class="exp-card-title">Rekap Gabungan (Absensi + Kas)</span><span class="exp-card-desc">Kompilasi ringkasan kegiatan dan status keuangan terpadu.</span></span></span>
+                <span class="exp-card-tag" style="background:#fef3c7;color:#92400e;border-color:#ffdcbd">Bundle Terintegrasi</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-note">Rekap absensi dan kas dalam satu berkas.</p>
+                <button class="exp-dark" onclick="openExGab()"><span class="msym" style="font-size:16px;color:#a5d0b9">download</span>Pilih Periode &amp; Export</button>
+              </div>
+            </article>
+            <article class="exp-card">
+              <div class="exp-card-hd">
+                <span class="exp-card-main"><span class="exp-card-ic" style="background:#e9e8e5;color:#1b4332"><span class="msym" style="font-size:22px">groups</span></span>
+                <span><span class="exp-card-title">Data Anggota</span><span class="exp-card-desc">Biodata dan status keaktifan anggota.</span></span></span>
+                <span class="exp-card-tag" style="background:#e9e8e5;color:#1b4332;border-color:#e8e6df">Master Biodata</span>
+              </div>
+              <div class="exp-card-body">
+                <p class="exp-note">Pilih anggota, lalu unduh (Excel / CSV / Print).</p>
+                <button class="exp-dark" onclick="openExpAng()"><span class="msym" style="font-size:16px;color:#a5d0b9">groups</span>Pilih Anggota &amp; Ekspor</button>
+              </div>
+            </article>
+            <footer class="exp-foot"><span class="js-grpname">Muda-Mudi</span> Margosari © 2026. Laporan pengurus.</footer>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MOBILE -->
+  <div class="mob-shell mob-only">
+
+    <!-- HOME — Luxury Mobile -->
+    <div class="mob-page on" id="mob-home" style="overflow-y:auto;background:#fbf9f6;overscroll-behavior:none">
+<div class="ndash-mob-wrap lux-mob">
+        <!-- Hero Banner -->
+        <section class="lux-hero">
+          <div class="lux-hero-glow lux-glow-a" aria-hidden="true"></div>
+          <div class="lux-hero-glow lux-glow-b" aria-hidden="true"></div>
+          <div class="lux-hero-top">
+            <span class="lux-date-pill"><span class="msym" style="font-size:14px;color:#ffdcbd">calendar_today</span><span class="js-date"></span></span>
+          </div>
+          <div class="lux-greet"><span id="dash-welcome-greet-mob">Selamat Pagi</span>, <em id="dash-welcome-name-mob">Admin</em></div>
+          <div class="lux-sub">Database <span class="js-grpname">Muda-Mudi</span> Margosari</div>
+          <div class="lux-micro">
+            <span>Kas Aktif: <strong id="lux-kas-mob">—</strong></span>
+            <span class="lux-dot-sep">•</span>
+            <span id="lux-sesi-mob">—</span>
+          </div>
+        </section>
+
+        <!-- Stat Cards 2x2 Luxury -->
+        <div class="sec-lbl-row"><span class="sec-lbl">Ringkasan Bulan Ini</span><span id="lux-bulan-lbl" class="lux-bulan-lbl"></span></div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-ic" style="background:#ebf5f0;color:#1b4332">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-lbl">Total Generus</span>
+              <div class="kpi-val-row"><span class="kpi-val" id="dash-generus-mob">—</span><span class="kpi-unit">Anggota</span></div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-ic" style="background:#ebf5f0;color:#1b4332">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-lbl">Kegiatan Bulan Ini</span>
+              <div class="kpi-val-row"><span class="kpi-val" id="dash-kegiatan-mob">—</span><span class="kpi-unit">Sesi</span></div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-ic" style="background:#fef3c7;color:#b45309">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-lbl">Rasio Kehadiran</span>
+              <div class="kpi-val-row"><span class="kpi-val" id="dash-persen-mob">—</span><span class="kpi-unit">Rata-rata</span></div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-ic" style="background:#ebf5f0;color:#006c48">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-lbl">Total Berangkat</span>
+              <div class="kpi-val-row"><span class="kpi-val" id="dash-hadir-mob">—</span><span class="kpi-unit">Orang-Sesi</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Luxury -->
+        <div class="ndash-mob-card lux-card">
+          <div class="ndash-sec-hd lux-sec-hd">
+            <span>Grafik Kehadiran &amp; Partisipasi</span>
+            <button onclick="goMob('rekap')" class="ndash-see-all">Rekap ›</button>
+          </div>
+          <div class="lux-chart-sub" id="lux-chart-sub">Tren kehadiran tiap sesi bulan ini</div>
+          <div class="ndash-mob-legend lux-legend">
+            <span><span class="nleg-dot" style="background:#006c48"></span>Hadir <b id="lux-leg-h">0</b></span>
+            <span><span class="nleg-dot" style="background:#b45309"></span>Izin <b id="lux-leg-i">0</b></span>
+            <span><span class="nleg-dot" style="background:#991b1b"></span>Alpa <b id="lux-leg-a">0</b></span>
+          </div>
+          <div id="dash-chart-mob" class="ndash-chart-wrap"></div>
+          <div class="lux-note" id="lux-chart-note"></div>
+        </div>
+
+        <!-- Recent Sessions Luxury -->
+        <div class="ndash-mob-card lux-card">
+          <div class="ndash-sec-hd lux-sec-hd">
+            <span>Kegiatan Terbaru</span>
+            <button onclick="goMob('absen')" class="ndash-see-all">Lihat Semua</button>
+          </div>
+          <div id="dash-recent-mob"></div>
+          <div class="lux-foot-btn"><button class="lux-outline-btn" onclick="goMob('absen')">Buka Rekap Seluruh Pertemuan</button></div>
+        </div>
+
+        <!-- Ringkasan Kas Luxury -->
+        <div class="ndash-mob-card lux-card">
+          <div class="ndash-sec-hd lux-sec-hd">
+            <span>Ringkasan Kas &amp; Arus Dana</span>
+            <button onclick="goMob('kas')" class="ndash-see-all">Buku Kas ›</button>
+          </div>
+          <div id="dash-kas-mob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSENSI LIST -->
+    <div class="mob-page" id="mob-absen" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Absensi</h3>
+      </div>
+      <div class="mob-scroll abs-lux" style="padding:12px">
+        <!-- STAGE 1: Hero -->
+        <div id="mob-stage-hero">
+          <section class="abs-hero abs-hero-mob">
+            <div class="abs-hero-glow abs-glow-a" aria-hidden="true"></div>
+            <div class="abs-hero-glow abs-glow-b" aria-hidden="true"></div>
+            <span class="lux-date-pill"><span class="msym" style="font-size:14px;color:#a5d0b9">calendar_today</span><span class="js-date"></span></span>
+            <h2 class="abs-hero-title">Mulai Absensi</h2>
+            <p class="abs-hero-desc">Pilih tanggal &amp; nama kegiatan untuk presensi hari ini.</p>
+            <button class="abs-hero-btn abs-hero-btn-full" onclick="showMobAbsenMain()">Mulai Absensi <span>→</span></button>
+            <div class="abs-hero-minstats"><span><strong id="abs-hero-sesi-m">—</strong> Sesi</span><span>•</span><span><strong id="abs-hero-gen-m">—</strong> Generus</span></div>
+          </section>
+          <section class="abs-toolbar abs-toolbar-mob">
+            <div class="abs-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+              <input id="dbSearchM" placeholder="Cari sesi atau tanggal..." oninput="renderDbMob()"/>
+            </div>
+            <div class="abs-filters">
+              <select id="dbFilterBulanM" onchange="renderDbMob()">
+                <option value="">Semua Bulan</option>
+                <option value="01">Januari</option><option value="02">Februari</option>
+                <option value="03">Maret</option><option value="04">April</option>
+                <option value="05">Mei</option><option value="06">Juni</option>
+                <option value="07">Juli</option><option value="08">Agustus</option>
+                <option value="09">September</option><option value="10">Oktober</option>
+                <option value="11">November</option><option value="12">Desember</option>
+              </select>
+              <select id="dbFilterTahunM" onchange="renderDbMob()">
+                <option value="">Semua Tahun</option>
+                <option value="2026">2026</option><option value="2027">2027</option>
+                <option value="2028">2028</option><option value="2029">2029</option>
+                <option value="2030">2030</option>
+              </select>
+              <select id="dbSortM" onchange="renderDbMob()">
+                <option value="desc">Terbaru Dulu</option>
+                <option value="asc">Terlama Dulu</option>
+              </select>
+            </div>
+          </section>
+          <div class="abs-sec-hd">
+            <span class="abs-sec-title">Riwayat Sesi</span>
+            <span class="abs-sec-dot"></span>
+            <span id="sesiFilterArrowM" style="display:none"></span>
+            <span id="sesiFilterRowM" style="display:none"></span>
+          </div>
+          <div id="dbListM" class="abs-list"><div class="empty">Belum ada sesi.</div></div>
+          <footer class="abs-foot"><span id="abs-foot-m">Menampilkan 0 sesi</span></footer>
+        </div>
+
+        <!-- STAGE 2: pilih tanggal + nama kegiatan saja -->
+        <div id="mob-stage-main" style="display:none">
+          <button class="stage-back" onclick="showMobAbsenHero()">← Kembali</button>
+          <div class="abs-form" id="absen-newbox-mob">
+            <div class="abs-form-hd">
+              <span>Mulai Absensi Baru</span>
+              <span class="abs-form-ic"><span class="msym" style="font-size:18px">calendar_today</span></span>
+            </div>
+            <div class="abs-form-body abs-form-col">
+              <div class="fr" style="margin:0"><label>Tanggal Kegiatan</label><input type="date" id="sTglM"/></div>
+              <div class="fr" style="margin:0"><label>Nama Kegiatan</label><input type="text" id="sKetM" placeholder="cth: Pengajian Rutin..." onkeydown="if(event.key==='Enter')mulaiAbsensi(true)"/></div>
+              <button class="abs-hero-btn abs-hero-btn-full" onclick="mulaiAbsensi(true)">Tampilkan Daftar →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABSENSI PAGE (isi absensi) -->
+    <div class="mob-page" id="mob-absen-page" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('absen')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3 id="mob-absen-title">Absensi</h3>
+      </div>
+      <div style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);background:var(--bg2);flex-shrink:0;display:flex;align-items:center;gap:8px">
+        <span id="mob-absen-date" onclick="openEditSesiPopup()" title="Klik untuk edit tanggal/kegiatan" style="flex:1;cursor:pointer"></span>
+      </div>
+      <div id="mob-bulk-bar" style="display:none;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--gold-xlt);flex-shrink:0;align-items:center;gap:6px;flex-wrap:wrap">
+        <span id="mob-bulk-count" style="font-size:11px;font-weight:600;color:var(--gold-dk);flex-basis:100%">0 dipilih</span>
+        <button onclick="applyBulkStatus('H')" class="btn-p" style="background:var(--green);padding:6px 8px;font-size:11px;flex:1">✓ Hadir</button>
+        <button onclick="applyBulkStatus('I')" class="btn-p" style="background:var(--amber);padding:6px 8px;font-size:11px;flex:1">? Izin</button>
+        <button onclick="applyBulkStatus('A')" class="btn-p" style="background:var(--red);padding:6px 8px;font-size:11px;flex:1">✕ Alfa</button>
+        <button class="btn-sec" onclick="toggleBulkMode()" style="padding:6px 8px;font-size:11px;flex-basis:100%">Batal</button>
+      </div>
+      <div class="counter-bar" id="mob-absen-ctr" style="flex-shrink:0"></div>
+      <div style="padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0">
+        <div class="seg">
+          <button class="seg-btn mseg on" id="mseg-S" onclick="setAbsenGender('S')">Semua</button>
+          <button class="seg-btn mseg" id="mseg-P" onclick="setAbsenGender('P')">Perempuan</button>
+          <button class="seg-btn mseg" id="mseg-L" onclick="setAbsenGender('L')">Laki-laki</button>
+        </div>
+      </div>
+      <div id="mob-absen-list" class="mob-scroll"></div>
+      <div class="selesai-bar" style="flex-shrink:0">
+        <div class="selesai-bar-info" id="mob-selesai-info"></div>
+        <button class="btn-p" onclick="selesaiAbsensiMob()" style="padding:9px 18px;font-size:13px">✓ Selesai</button>
+      </div>
+    </div>
+
+    <!-- REKAP -->
+    <div class="mob-page" id="mob-rekap" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Rekap</h3>
+      </div>
+<div class="mob-scroll rekap-lux">
+        <div class="rekap-lux-wrap rekap-lux-wrap-mob">
+          <div class="rekap-head">
+            <span class="rekap-date-pill"><span class="lux-sync-dot"></span><span class="js-date"></span></span>
+            <h2 class="rekap-title">Rekap &amp; Statistik Kehadiran</h2>
+            <p class="rekap-sub2">Database <span class="js-grpname">Muda-Mudi</span> Margosari</p>
+            <div class="rekap-head-filters">
+              <select id="rBulanM" onchange="renderRekap('mob')" aria-label="Pilih Bulan">
+                <option value="1">Bulan: Januari</option><option value="2">Bulan: Februari</option><option value="3">Bulan: Maret</option>
+                <option value="4">Bulan: April</option><option value="5">Bulan: Mei</option><option value="6">Bulan: Juni</option>
+                <option value="7">Bulan: Juli</option><option value="8">Bulan: Agustus</option><option value="9">Bulan: September</option>
+                <option value="10">Bulan: Oktober</option><option value="11">Bulan: November</option><option value="12">Bulan: Desember</option>
+              </select>
+              <select id="rTahunM" onchange="renderRekap('mob')" aria-label="Pilih Tahun">
+                <option value="2026" selected>Tahun: 2026</option><option value="2027">Tahun: 2027</option>
+                <option value="2028">Tahun: 2028</option><option value="2029">Tahun: 2029</option><option value="2030">Tahun: 2030</option>
+              </select>
+              <select id="rGenderM" onchange="renderRekap('mob')" style="display:none">
+                <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+              </select>
+              <select id="rSortM" onchange="renderRekap('mob')" style="display:none">
+                <option value="asc">Terlama Dulu</option>
+                <option value="desc">Terbaru Dulu</option>
+              </select>
+              <span id="rekapFilterArrowM" style="display:none"></span>
+              <div id="rekapFilterRowM" style="display:none"></div>
+            </div>
+          </div>
+          <div id="rekapStatsM"></div>
+          <section class="rekap-matrix-card">
+            <div class="rekap-matrix-hd">
+              <div class="rekap-matrix-title">
+                <h3>Matriks Presensi <span class="rekap-sesi-pill" id="rekap-sesi-pill-m">0 Sesi</span></h3>
+                <p>Kehadiran rinci per sesi &amp; persentase bulanan</p>
+              </div>
+              <div class="rekap-matrix-tools">
+                <div class="rekap-search">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
+                  <input id="rSearchM" placeholder="Cari nama generus..." oninput="renderRekap('mob')"/>
+                </div>
+                <div class="rekap-seg" id="rSegM">
+                  <button data-g="S" class="on" onclick="rekapSetGender('mob','S')">Semua</button>
+                  <button data-g="P" onclick="rekapSetGender('mob','P')">Pr</button>
+                  <button data-g="L" onclick="rekapSetGender('mob','L')">Lk</button>
+                </div>
+              </div>
+            </div>
+            <div class="rekap-tbl-wrap"><div class="scroll-x"><table class="rekap-tbl-x"><thead id="theadRekapM"></thead><tbody id="tbodyRekapM"></tbody></table></div><div class="rekap-tbl-fade">geser untuk lihat kolom lainnya</div></div>
+            <div class="rekap-matrix-foot"><span id="rekap-foot-m"></span></div>
+          </section>
+          <div id="izinSheetM"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAINNYA -->
+    <div class="mob-page" id="mob-lainnya" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Lainnya</h3>
+      </div>
+      <div class="mob-scroll lain-lux" style="background:#fbf9f6">
+        <div class="lain-lux-wrap lain-lux-wrap-mob">
+          <section class="lain-profile">
+            <span class="lain-avatar"><span class="js-uinit">A</span><i></i></span>
+            <div class="lain-profile-info">
+              <div class="lain-profile-name"><span class="js-uname">Administrator</span><span class="lain-super">Super Admin</span></div>
+              <div class="lain-profile-role js-urole">Admin Utama</div>
+            </div>
+            <span id="mob-sync-badge" class="sync-badge sync-ok">Online</span>
+          </section>
+          <div id="mob-group-switch-wrap" style="display:none;margin:0 0 12px">
+            <label for="mob-group-switcher" style="display:block;font-size:11px;font-weight:700;color:var(--text3);margin:0 4px 6px;letter-spacing:.4px">LIHAT DATA KELOMPOK:</label>
+            <select id="mob-group-switcher" onchange="switchGroup(this.value)" aria-label="Pindah kelompok" style="width:100%;padding:10px 12px;border-radius:12px"></select>
+          </div>
+          <section class="lain-grid lain-grid-mob">
+            <button class="lain-card" onclick="openActivityLog()">
+              <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">schedule</span></span>
+              <span><span class="lain-name">Log Aktivitas</span><span class="lain-sub">Riwayat aktivitas semua pengguna</span></span></span>
+              <span class="lain-go">›</span>
+            </button>
+            <button class="lain-card" onclick="goMob('anggota')">
+              <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">groups</span></span>
+              <span><span class="lain-name">Anggota <span class="lain-mini" id="lain-jml-m">26 Aktif</span></span><span class="lain-sub">Kelola data anggota &amp; arsip</span></span></span>
+              <span class="lain-go">›</span>
+            </button>
+            <button class="lain-card" onclick="goMob('ekspor')">
+              <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">download</span></span>
+              <span><span class="lain-name">Ekspor Data</span><span class="lain-sub">Rekap, kas, dan anggota</span></span></span>
+              <span class="lain-go">›</span>
+            </button>
+            <button class="lain-card" onclick="goMob('tentang')">
+              <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">info</span></span>
+              <span><span class="lain-name">Tentang Aplikasi</span><span class="lain-sub">Info &amp; panduan penggunaan</span></span></span>
+              <span class="lain-go">›</span>
+            </button>
+          </section>
+          <section>
+            <button class="lain-card lain-logout" onclick="doLogout()">
+              <span class="lain-left"><span class="lain-ic"><span class="msym" style="font-size:24px">logout</span></span>
+              <span><span class="lain-name">Logout</span><span class="lain-sub">Keluar dari perangkat ini</span></span></span>
+              <span class="lain-go">›</span>
+            </button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- TENTANG APLIKASI -->
+    <div class="mob-page" id="mob-tentang" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Tentang Aplikasi</h3>
+      </div>
+      <div class="mob-scroll" style="background:#fbf9f6">
+        <div class="tentang-wrap">
+
+          <!-- Header -->
+          <div class="tentang-hero">
+            <div class="tentang-hero-ic"><svg class="ico"><use href="#ico-info"/></svg></div>
+            <div class="tentang-hero-info">
+              <div class="tentang-hero-title">Tentang Aplikasi</div>
+              <div class="tentang-hero-sub">Informasi dan panduan penggunaan aplikasi</div>
+            </div>
+          </div>
+
+          <!-- Tentang -->
+          <div class="tentang-card">
+            <div class="tentang-card-hd">Tentang Aplikasi</div>
+            <p class="tentang-text">Aplikasi ini membantu pengelolaan data generus Margosari — mulai dari data anggota, absensi, kas, rekap kegiatan, hingga aktivitas pengguna, arsip data, dan ekspor data — dalam satu tempat yang rapi dan mudah diakses. Khusus akun Caberawit, anggota dikelompokkan per kelas (PAUD, Tilawati 1–6, Al-Quran).</p>
+            <div class="tentang-points">
+              <span class="tentang-point"><svg class="ico"><use href="#ico-users"/></svg> Data anggota</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-clipboard"/></svg> Absensi</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-wallet"/></svg> Kas</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-chart"/></svg> Rekap kegiatan</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-clock"/></svg> Aktivitas pengguna</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-db"/></svg> Arsip data</span>
+              <span class="tentang-point"><svg class="ico"><use href="#ico-download"/></svg> Ekspor data</span>
+            </div>
+          </div>
+
+          <!-- Fitur Utama -->
+          <div class="tentang-sec-title">Fitur Utama</div>
+          <div class="tentang-features">
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+              <span class="tentang-feat-name">Absensi</span>
+              <span class="tentang-feat-sub">Mencatat dan memantau kehadiran anggota.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+              <span class="tentang-feat-name">Kas</span>
+              <span class="tentang-feat-sub">Mengelola pemasukan, pengeluaran, dan saldo kas.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-users"/></svg></span>
+              <span class="tentang-feat-name">Anggota</span>
+              <span class="tentang-feat-sub">Mengelola data anggota aktif maupun arsip.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-chart"/></svg></span>
+              <span class="tentang-feat-name">Rekap</span>
+              <span class="tentang-feat-sub">Melihat ringkasan dan statistik data.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-clock"/></svg></span>
+              <span class="tentang-feat-name">Log Aktivitas</span>
+              <span class="tentang-feat-sub">Melihat riwayat aktivitas pengguna.</span>
+            </div>
+            <div class="tentang-feat nd-card">
+              <span class="tentang-feat-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-download"/></svg></span>
+              <span class="tentang-feat-name">Ekspor</span>
+              <span class="tentang-feat-sub">Mengunduh atau mengekspor data yang diperlukan.</span>
+            </div>
+          </div>
+
+          <!-- Cara Menggunakan -->
+          <div class="tentang-sec-title">Cara Menggunakan</div>
+          <div class="tentang-guide">
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--green-lt);color:var(--green)"><svg class="ico"><use href="#ico-clipboard"/></svg></span>
+                <span class="tentang-guide-name">Absensi</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Absensi</b> → klik <b>Mulai Absensi</b>.</li>
+                <li>Pilih <b>tanggal</b> dan isi <b>nama kegiatan</b> → klik <b>Tampilkan Daftar</b>.</li>
+                <li>Isi status tiap anggota dengan menekan tombol status (<b>Hadir / Izin / Alfa</b>).</li>
+                <li>Mau isi banyak sekaligus? <b>Tahan nama anggota</b> hingga muncul mode pilih banyak, centang nama-namanya, lalu pilih statusnya.</li>
+                <li>Setelah selesai, klik <b>Selesai &amp; Simpan</b>.</li>
+                <li>Mengubah/mengisi ulang: <b>klik kegiatan</b> di daftar <b>Riwayat Sesi</b>. Menghapus sesi: <b>geser ke kiri</b> pada kegiatannya.</li>
+              </ol>
+            </div>
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--gold-lt);color:var(--gold-dk)"><svg class="ico"><use href="#ico-wallet"/></svg></span>
+                <span class="tentang-guide-name">Kas</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Kas</b> → klik <b>+ Tambah Transaksi</b>.</li>
+                <li>Isi <b>nominal</b>, pilih jenis <b>Masuk / Keluar</b>, isi <b>keterangan</b>, dan tentukan <b>tanggal</b>.</li>
+                <li>Simpan transaksi.</li>
+                <li>Mengubah transaksi: <b>klik</b> transaksinya. Menghapus: <b>geser ke kiri</b> pada transaksinya.</li>
+              </ol>
+            </div>
+
+            <div class="tentang-guide-card nd-card">
+              <div class="tentang-guide-hd">
+                <span class="tentang-guide-ic" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico"><use href="#ico-download"/></svg></span>
+                <span class="tentang-guide-name">Ekspor</span>
+              </div>
+              <ol class="tentang-guide-list">
+                <li>Buka menu <b>Ekspor</b>.</li>
+                <li>Pilih data yang mau diambil: <b>Rekap Absensi Bulanan</b>, <b>Laporan Kas</b>, atau <b>Data Anggota</b>.</li>
+                <li>Pilih <b>periode</b> (Bulan / Tahun / Custom) dan jenis kelamin bila perlu, lalu pilih format: <b>Excel</b>, <b>CSV</b>, atau <b>Print</b>.</li>
+                <li>Hasil <b>Print</b> dibuka sebagai dokumen A4 landscape yang siap dicetak.</li>
+              </ol>
+            </div>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="tentang-foot">Dibuat untuk membantu pengelolaan data secara lebih mudah, cepat, dan terorganisir.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EKSPOR -->
+    <div class="mob-page" id="mob-ekspor" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Ekspor</h3>
+      </div>
+      <div class="mob-scroll exp-lux" style="background:#fbf9f6">
+        <div class="exp-lux-wrap exp-lux-wrap-mob">
+          <div class="exp-lux-head">
+            <h2>Ekspor &amp; Unduh Laporan</h2>
+            <p>Unduh rekap kehadiran, laporan kas, dan data anggota dalam Excel, CSV, dan Print.</p>
+          </div>
+          <article class="exp-card">
+            <div class="exp-card-hd">
+              <span class="exp-card-main"><span class="exp-card-ic" style="background:#ebf5f0;color:#1b4332"><span class="msym" style="font-size:22px">bar_chart</span></span>
+              <span><span class="exp-card-title">Rekap Absensi Bulanan</span><span class="exp-card-desc">Kehadiran generus per sesi pertemuan.</span></span></span>
+            </div>
+            <div class="exp-card-body">
+              <label class="exp-lbl">Periode &amp; Parameter</label>
+              <div class="exp-grid">
+                <select id="exRekapPeriodeM" class="exp-full" onchange="exPeriodeChanged('rekap')">
+                  <option value="bulan" selected>Bulan tertentu</option>
+                  <option value="tahun">Tahun tertentu</option>
+                  <option value="custom">Custom...</option>
+                  <option value="semua">Semua data</option>
+                </select>
+                <span id="exRekapBulanRowM" class="exp-row2">
+                  <span id="exRekapBulanWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exRekapBulanM" style="width:100%">
+                      <option value="01">Januari</option><option value="02">Februari</option>
+                      <option value="03">Maret</option><option value="04">April</option>
+                      <option value="05">Mei</option><option value="06">Juni</option>
+                      <option value="07">Juli</option><option value="08">Agustus</option>
+                      <option value="09">September</option><option value="10">Oktober</option>
+                      <option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                  </span>
+                  <span id="exRekapTahunWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exRekapTahunM" style="width:100%">
+                      <option value="2025">2025</option><option value="2026">2026</option>
+                      <option value="2027">2027</option><option value="2028">2028</option>
+                      <option value="2029">2029</option><option value="2030">2030</option>
+                    </select>
+                  </span>
+                </span>
+                <span class="exp-row2" id="exRekapCustomM" style="display:none">
+                  <input type="date" id="exRekapDariM" style="flex:1;min-width:0">
+                  <span class="exp-sep">—</span>
+                  <input type="date" id="exRekapSampaiM" style="flex:1;min-width:0">
+                </span>
+                <select id="exRekapGenderM">
+                  <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+                </select>
+              </div>
+              <div class="exp-actions">
+                <button class="exp-btn" onclick="eksporRekap('excel')">Excel</button>
+                <button class="exp-btn" onclick="eksporRekap('csv')">CSV</button>
+                <button class="exp-btn" onclick="eksporRekap('print')">Print</button>
+              </div>
+            </div>
+          </article>
+          <article class="exp-card">
+            <div class="exp-card-hd">
+              <span class="exp-card-main"><span class="exp-card-ic" style="background:#ebf5f0;color:#006c48"><span class="msym" style="font-size:22px">account_balance_wallet</span></span>
+              <span><span class="exp-card-title">Laporan Kas</span><span class="exp-card-desc">Arus kas serta saldo per periode.</span></span></span>
+            </div>
+            <div class="exp-card-body">
+              <label class="exp-lbl">Periode Pembukuan</label>
+              <div class="exp-grid">
+                <select id="exKasPeriodeM" class="exp-full" onchange="exPeriodeChanged('kas')">
+                  <option value="bulan" selected>Bulan tertentu</option>
+                  <option value="tahun">Tahun tertentu</option>
+                  <option value="custom">Custom...</option>
+                  <option value="semua">Semua data</option>
+                </select>
+                <span id="exKasBulanRowM" class="exp-row2">
+                  <span id="exKasBulanWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exKasBulanM" style="width:100%">
+                      <option value="01">Januari</option><option value="02">Februari</option>
+                      <option value="03">Maret</option><option value="04">April</option>
+                      <option value="05">Mei</option><option value="06">Juni</option>
+                      <option value="07">Juli</option><option value="08">Agustus</option>
+                      <option value="09">September</option><option value="10">Oktober</option>
+                      <option value="11">November</option><option value="12">Desember</option>
+                    </select>
+                  </span>
+                  <span id="exKasTahunWrapM" style="flex:1;display:flex;min-width:0">
+                    <select id="exKasTahunM" style="width:100%">
+                      <option value="2025">2025</option><option value="2026">2026</option>
+                      <option value="2027">2027</option><option value="2028">2028</option>
+                      <option value="2029">2029</option><option value="2030">2030</option>
+                    </select>
+                  </span>
+                </span>
+                <span class="exp-row2" id="exKasCustomM" style="display:none">
+                  <input type="date" id="exKasDariM" style="flex:1;min-width:0">
+                  <span class="exp-sep">—</span>
+                  <input type="date" id="exKasSampaiM" style="flex:1;min-width:0">
+                </span>
+              </div>
+              <div class="exp-actions">
+                <button class="exp-btn" onclick="eksporKas('excel')">Excel</button>
+                <button class="exp-btn" onclick="eksporKas('csv')">CSV</button>
+                <button class="exp-btn" onclick="eksporKas('print')">Print</button>
+              </div>
+            </div>
+          </article>
+          <article class="exp-card">
+            <div class="exp-card-hd">
+              <span class="exp-card-main"><span class="exp-card-ic" style="background:#fef3c7;color:#92400e"><span class="msym" style="font-size:22px">download</span></span>
+              <span><span class="exp-card-title">Rekap Gabungan</span><span class="exp-card-desc">Absensi + Kas satu file.</span></span></span>
+            </div>
+            <div class="exp-card-body">
+              <button class="exp-dark exp-dark-full" onclick="openExGab()">Pilih Periode &amp; Export</button>
+            </div>
+          </article>
+          <article class="exp-card">
+            <div class="exp-card-hd">
+              <span class="exp-card-main"><span class="exp-card-ic" style="background:#e9e8e5;color:#1b4332"><span class="msym" style="font-size:22px">groups</span></span>
+              <span><span class="exp-card-title">Data Anggota</span><span class="exp-card-desc">Ekspor biodata anggota.</span></span></span>
+            </div>
+            <div class="exp-card-body">
+              <button class="exp-dark exp-dark-full" onclick="openExpAng()">Pilih Anggota &amp; Ekspor</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANGGOTA -->
+    <div class="mob-page" id="mob-anggota" style="overflow:hidden">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <button class="mob-back" onclick="goMob('lainnya')"><svg class="ico"><use href="#ico-arrow-left"/></svg></button>
+        <h3>Anggota</h3>
+        <button class="btn-p" onclick="openAddAnggotaPopup()" style="margin-left:4px;padding:5px 10px;font-size:12px">+ Tambah</button>
+      </div>
+      <div class="toolbar" style="flex-shrink:0">
+        <input id="srchAM" placeholder="Cari nama..." style="flex:1" oninput="renderAnggotaMob()"/>
+        <select id="srchFilterAM" onchange="renderAnggotaMob()" style="max-width:100px">
+          <option value="">Semua Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Arsip">Arsip</option>
+        </select>
+      </div>
+      <div id="anggotaListM" class="mob-scroll"></div>
+    </div>
+
+    <!-- KAS MOBILE -->
+    <div class="mob-page kas-lux" id="mob-kas" style="overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none">
+      <div class="mob-pg-hd" style="flex-shrink:0">
+        <h3>Kas</h3>
+      </div>
+      <!-- Hidden mobile stat IDs -->
+      <span id="mks-saldo" style="display:none"></span><span id="mks-masuk" style="display:none"></span><span id="mks-keluar" style="display:none"></span><span id="mks-selisih" style="display:none"></span><span id="mks-masuk-sub" style="display:none"></span><span id="mks-keluar-sub" style="display:none"></span><span id="mks-selisih-sub" style="display:none"></span>
+      <div class="kas-lux-wrap kas-lux-wrap-mob">
+      <!-- Hero -->
+      <section class="kas-hero kas-hero-mob">
+        <div class="kas-hero-glow" aria-hidden="true"></div>
+        <span class="kas-hero-date"><span class="msym" style="font-size:15px">calendar_today</span><span class="js-date"></span></span>
+        <h2 class="kas-hero-title">Kelola Kas</h2>
+        <p class="kas-hero-desc">Catat pemasukan &amp; pengeluaran kas</p>
+        <button class="kas-hero-btn kas-hero-btn-full" onclick="openKasTambah()"><span style="font-size:18px;line-height:1">+</span> Tambah Transaksi</button>
+      </section>
+      <!-- Cash Flow card -->
+      <div class="kas-cf-card">
+        <div class="kas-cf-hd">
+          <span class="kas-cf-title">Cash Flow — Periode</span>
+          <div class="kas-cf-filters">
+            <select id="kasBulanM" onchange="renderKas()">
+              <option value="01">Januari</option><option value="02">Februari</option>
+              <option value="03">Maret</option><option value="04">April</option>
+              <option value="05">Mei</option><option value="06">Juni</option>
+              <option value="07">Juli</option><option value="08">Agustus</option>
+              <option value="09">September</option><option value="10">Oktober</option>
+              <option value="11">November</option><option value="12">Desember</option>
+            </select>
+            <select id="kasTahunM" onchange="renderKas()">
+              <option value="2025">2025</option><option value="2026" selected>2026</option>
+              <option value="2027">2027</option><option value="2028">2028</option>
+              <option value="2029">2029</option><option value="2030">2030</option>
+            </select>
+          </div>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:#e8e6df;color:#4b5563">
+            <span class="msym" style="font-size:16px">wallet</span>
+          </div>
+          <span class="kas-cf-row-label">Saldo Awal</span>
+          <span class="kas-cf-row-val" id="mcf-saldo-awal" style="color:#1f2937">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:rgba(209,250,229,.6);color:#006c48">
+            <span class="msym" style="font-size:16px">trending_up</span>
+          </div>
+          <span class="kas-cf-row-label">Total Pemasukan</span>
+          <span class="kas-cf-row-val kas-masuk" id="mcf-pemasukan">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:rgba(254,226,226,.7);color:#ba1a1a">
+            <span class="msym" style="font-size:16px">trending_down</span>
+          </div>
+          <span class="kas-cf-row-label">Total Pengeluaran</span>
+          <span class="kas-cf-row-val kas-keluar" id="mcf-pengeluaran">Rp0</span>
+        </div>
+        <div class="kas-cf-row">
+          <div class="kas-cf-row-icon" style="background:#e8e6df;color:#4b5563">
+            <span class="msym" style="font-size:16px">schedule</span>
+          </div>
+          <span class="kas-cf-row-label">Selisih</span>
+          <span class="kas-cf-row-val" id="mcf-selisih">Rp0</span>
+        </div>
+        <div class="kas-cf-saldo-akhir">
+          <span class="kas-cf-saldo-akhir-lbl">Saldo Akhir</span>
+          <span class="kas-cf-saldo-akhir-val" id="mcf-saldo-akhir">Rp0</span>
+        </div>
+      </div>
+      <!-- Donut Komposisi card (mobile) -->
+      <div class="kas-donut-card">
+        <div class="kas-donut-ttl">Komposisi Periode</div>
+        <div class="kas-mob-donut-inner">
+          <div style="flex:1;min-width:0"><div id="kasDonutLegendM"></div></div>
+          <div id="kasDonutSvgM" style="display:flex;justify-content:center;align-items:center;flex-shrink:0"></div>
+        </div>
+      </div>
+      <!-- Line Chart Card (Mobile) -->
+      <div class="kas-line-card">
+        <div class="kas-line-hd">
+          <span class="kas-line-title">Tren Pemasukan &amp; Pengeluaran</span>
+          <span class="kas-line-yr" id="kasLineYearM">—</span>
+          <div class="kas-line-legend">
+            <span class="kas-line-leg"><span class="kas-line-dot" style="background:#1b4332"></span>Masuk</span>
+            <span class="kas-line-leg"><span class="kas-line-dot" style="background:#ba1a1a"></span>Keluar</span>
+          </div>
+        </div>
+        <div class="kas-line-body"><div id="kasLineChartM"></div></div>
+      </div>
+      <!-- Mobile transaction list -->
+      <div class="kas-tbl-hd" style="border:none;background:none;box-shadow:none;padding:4px 2px 0">
+        <span class="kas-tbl-title" id="kasMobTblTitle">TRANSAKSI PERIODE</span>
+      </div>
+      <div id="kasMobTblBody" style="padding-bottom:90px;flex-shrink:0"></div>
+      </div><!-- end kas-lux-wrap-mob -->
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="mob-bottom-nav">
+      <div class="mob-nav-pill">
+        <button class="mob-nav-item on" id="bn-home" onclick="goMob('home')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-home"/></svg></div>
+          Dashboard
+        </button>
+        <button class="mob-nav-item need-absen" id="bn-absen" onclick="goMob('absen')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-clipboard"/></svg></div>
+          Absensi
+        </button>
+        <button class="mob-nav-item" id="bn-kas" onclick="goMob('kas')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-money"/></svg></div>
+          Kas
+        </button>
+        <button class="mob-nav-item" id="bn-rekap" onclick="goMob('rekap')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-chart"/></svg></div>
+          Rekap
+        </button>
+        <button class="mob-nav-item" id="bn-lainnya" onclick="goMob('lainnya')">
+          <div class="mob-nav-icon"><svg class="ico"><use href="#ico-menu"/></svg></div>
+          Lainnya
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MEMBER DETAIL MODAL -->
+<div id="mdet-overlay" class="mdet-overlay" onclick="closeMemberDetail()"></div>
+<div id="mdet-modal" class="mdet-modal">
+  <div class="mdet-header">
+    <div id="mdet-avatar" class="avatar" style="width:42px;height:42px;font-size:14px;flex-shrink:0"></div>
+    <div style="flex:1;min-width:0">
+      <div id="mdet-name" class="mdet-name"></div>
+      <div id="mdet-gender" class="mdet-gender"></div>
+    </div>
+    <button class="mdet-close" onclick="closeMemberDetail()">✕</button>
+  </div>
+  <div id="mdet-stats" class="mdet-stats"></div>
+  <div id="mdet-donut-wrap" style="display:flex;align-items:center;gap:18px;padding:14px 18px 10px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0">
+    <svg id="mdet-donut-svg" width="80" height="80" viewBox="0 0 80 80" style="flex-shrink:0">
+      <circle cx="40" cy="40" r="28" fill="none" stroke="var(--border)" stroke-width="14"/>
+      <g id="mdet-donut-arcs"></g>
+      <text id="mdet-donut-pct" x="40" y="44" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">—</text>
+    </svg>
+    <div id="mdet-donut-legend" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
+  </div>
+  <div class="mdet-filter-bar">
+    <select id="mdet-f-tahun" onchange="applyMdetFilter()" style="min-width:76px">
+      <option value="">Semua Tahun</option>
+      <option value="2026">2026</option><option value="2027">2027</option>
+      <option value="2028">2028</option><option value="2029">2029</option>
+      <option value="2030">2030</option>
+    </select>
+    <select id="mdet-f-bulan" onchange="applyMdetFilter()" style="min-width:100px">
+      <option value="">Semua Bulan</option>
+      <option value="01">Januari</option><option value="02">Februari</option>
+      <option value="03">Maret</option><option value="04">April</option>
+      <option value="05">Mei</option><option value="06">Juni</option>
+      <option value="07">Juli</option><option value="08">Agustus</option>
+      <option value="09">September</option><option value="10">Oktober</option>
+      <option value="11">November</option><option value="12">Desember</option>
+    </select>
+    <button id="mdet-sort-btn" class="mdet-sort-btn" onclick="toggleMdetSort()" title="Urutan tanggal">↑ A→Z</button>
+  </div>
+  <div class="mdet-status-bar">
+    <span class="mdet-status-lbl">Filter Status:</span>
+    <button id="mdsf-H" class="mdet-sf-btn sf-h on" onclick="toggleMdetStatus('H')">✓ Hadir</button>
+    <button id="mdsf-I" class="mdet-sf-btn sf-i on" onclick="toggleMdetStatus('I')">? Izin</button>
+    <button id="mdsf-A" class="mdet-sf-btn sf-a on" onclick="toggleMdetStatus('A')">✕ Alfa</button>
+    <button id="mdsf-X" class="mdet-sf-btn sf-x on" onclick="toggleMdetStatus('X')">— Belum</button>
+    <button class="mdet-sf-reset" onclick="resetMdetStatus()">Reset</button>
+  </div>
+  <div class="mdet-section-title">
+    Riwayat Kehadiran &nbsp;<span id="mdet-count" style="font-weight:400;color:var(--text3)"></span>
+  </div>
+  <div class="mdet-table-wrap">
+    <table class="mdet-table">
+      <thead><tr><th>No</th><th>Tanggal</th><th>Kegiatan</th><th>Status</th><th>Keterangan</th></tr></thead>
+      <tbody id="mdet-tbody"></tbody>
+    </table>
+  </div>
+  <div class="mdet-footer">
+    <button onclick="exportMemberExcel()">Excel</button>
+    <button onclick="exportMemberCSV()">CSV</button>
+    <button onclick="exportMemberPrint()">Print</button>
+    <button onclick="editNamaAnggota()">Edit Nama</button>
+    <button id="mdet-kelas-btn" onclick="editKelasAnggota()" style="display:none;color:var(--green);border-color:var(--green);background:var(--green-lt)">Pindah Kelas</button>
+    <button id="mdet-arsip-btn" onclick="arsipToggleAnggota()" style="color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)">Arsipkan</button>
+    <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">Hapus</button>
+    <button class="mdet-close-btn" onclick="closeMemberDetail()">Tutup</button>
+  </div>
+</div>
+
+<!-- STATUS FLOATING MENU -->
+<div id="status-menu-overlay" onclick="closeStatusMenu()"></div>
+<div id="status-menu" class="status-menu">
+  <div class="status-menu-title">Update Status</div>
+  <div id="status-menu-items"></div>
+</div>
+
+<!-- IZIN POPUP -->
+<div id="add-anggota-overlay" class="izin-overlay" onclick="closeAddAnggotaPopup()"></div>
+<div id="add-anggota-popup" class="izin-popup" style="width:min(340px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)">
+      <svg style="width:17px;height:17px;fill:currentColor" viewBox="0 0 24 24"><path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Tambah Anggota</div>
+      <div class="izin-popup-name">Isi nama dan jenis kelamin</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label" style="color:var(--green)">Nama Lengkap</label>
+    <input type="text" id="iNama" placeholder="Nama lengkap..." style="width:100%;box-sizing:border-box;margin-bottom:12px" onkeydown="if(event.key==='Enter')submitAddAnggota()"/>
+    <label class="izin-popup-label" style="color:var(--green)">Jenis Kelamin</label>
+    <select id="iGender" style="width:100%;box-sizing:border-box"><option value="P">Perempuan</option><option value="L">Laki-laki</option></select>
+    <div id="iKelasRow" style="display:none;margin-top:12px">
+      <label class="izin-popup-label" style="color:var(--green)">Kelas (Caberawit)</label>
+      <select id="iKelas" style="width:100%;box-sizing:border-box">
+        <option value="PAUD">PAUD</option>
+        <option value="Tilawati 1">Tilawati 1</option>
+        <option value="Tilawati 2">Tilawati 2</option>
+        <option value="Tilawati 3">Tilawati 3</option>
+        <option value="Tilawati 4">Tilawati 4</option>
+        <option value="Tilawati 5">Tilawati 5</option>
+        <option value="Tilawati 6">Tilawati 6</option>
+        <option value="Al-Quran">Al-Quran</option>
+      </select>
+    </div>
+  </div>
+  <div class="izin-popup-footer">
+    <button class="btn-sec" onclick="closeAddAnggotaPopup()">Batal</button>
+    <button class="btn-p" style="background:var(--green)" onclick="submitAddAnggota()">Tambah</button>
+  </div>
+</div>
+<div id="editsesi-overlay" class="izin-overlay" onclick="closeEditSesiPopup()"></div>
+<div id="editsesi-popup" class="izin-popup" style="width:min(340px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-xlt);color:var(--gold-dk)">
+      <svg class="ico" style="width:17px;height:17px"><use href="#ico-edit"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--gold-dk)">Edit Sesi</div>
+      <div class="izin-popup-name">Ubah tanggal dan nama kegiatan</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Tanggal Kegiatan</label>
+    <input type="date" id="esTgl" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
+    <label class="izin-popup-label" style="color:var(--gold-dk)">Nama Kegiatan</label>
+    <input type="text" id="esKet" placeholder="cth: Pengajian Rutin, Rapat Bulanan..." style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')submitEditSesiDetail()"/>
+    <div id="esWarn" style="display:none;margin-top:10px;font-size:11.5px;color:var(--red);background:#fee2e2;border-radius:8px;padding:8px 10px"></div>
+  </div>
+  <div class="izin-popup-footer">
+    <button class="btn-sec" onclick="closeEditSesiPopup()">Batal</button>
+    <button class="btn-p" style="background:var(--gold-dk)" onclick="submitEditSesiDetail()">Simpan</button>
+  </div>
+</div>
+<div id="izin-overlay" class="izin-overlay" onclick="closeIzinPopup()"></div>
+<div id="izin-popup" class="izin-popup">
+  <div class="izin-popup-header">
+    <span class="izin-popup-icon">?</span>
+    <div>
+      <div class="izin-popup-title">Izin</div>
+      <div class="izin-popup-name" id="izin-popup-name"></div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <label class="izin-popup-label">Keterangan</label>
+    <div class="izin-templates" style="margin-bottom:8px">
+      <button class="izin-tpl" onclick="fillIzinPopup('Sakit')">Sakit</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Kerja')">Kerja</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Kuliah')">Kuliah</button>
+      <button class="izin-tpl" onclick="fillIzinPopup('Keluarga')">Keluarga</button>
+    </div>
+    <input type="text" id="izin-popup-note" placeholder="cth: sakit, ada acara keluarga..." autocomplete="off"/>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeIzinPopup()">Batal</button>
+    <button class="btn-p izin-save-btn" onclick="saveIzinPopup()">Simpan Izin</button>
+  </div>
+</div>
+
+<!-- APP POPUP — pengganti alert()/confirm()/prompt() bawaan browser, dipakai di semua modul -->
+<div id="app-popup-overlay" class="izin-overlay" onclick="closeAppPopup()"></div>
+<div id="app-popup" class="izin-popup" style="width:min(360px,92vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" id="app-popup-icon">
+      <svg class="ico" style="width:17px;height:17px"><use id="app-popup-icon-use" href="#ico-q"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" id="app-popup-title">Konfirmasi</div>
+    </div>
+  </div>
+  <div class="izin-popup-body">
+    <div id="app-popup-msg" style="font-size:13px;color:var(--text2);line-height:1.55;white-space:pre-line"></div>
+    <input type="text" id="app-popup-input" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:12px;display:none" onkeydown="if(event.key==='Enter'){event.preventDefault();_appPopupSubmit();}"/>
+  </div>
+  <div class="izin-popup-footer">
+    <button id="app-popup-cancel" onclick="closeAppPopup()">Batal</button>
+    <button class="btn-p" id="app-popup-ok" onclick="_appPopupSubmit()">Ya, Lanjutkan</button>
+  </div>
+</div>
+
+<!-- UPDATE NOTIFICATION — muncul hanya ketika ada pembaruan yang butuh refresh -->
+<div id="update-overlay" class="izin-overlay" onclick="closeUpdateNotification()"></div>
+<div id="update-popup" class="izin-popup update-popup">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-lt);color:var(--gold-dk)">
+      <svg class="ico" style="width:17px;height:17px"><use href="#ico-reset"/></svg>
+    </div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--gold-dk)">Aplikasi Telah Diperbarui</div>
+      <div class="izin-popup-name">Ada pembaruan pada aplikasi</div>
+    </div>
+    <button class="update-popup-close" onclick="closeUpdateNotification()" title="Tutup">✕</button>
+  </div>
+  <div class="izin-popup-body">
+    <div class="update-popup-msg">Ada pembaruan pada aplikasi. Silakan refresh halaman terlebih dahulu agar perubahan terbaru dapat digunakan.</div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeUpdateNotification()">Nanti</button>
+    <button class="btn-p update-popup-btn" onclick="refreshNow()">↻ Refresh Sekarang</button>
+  </div>
+</div>
+
+<!-- KAS TAMBAH TRANSAKSI POPUP -->
+<div id="kas-tambah-overlay" class="izin-overlay" onclick="closeKasTambah()"></div>
+<div id="kas-tambah-popup" class="izin-popup kas-popup">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--gold-lt);color:var(--brown)">
+      <svg style="width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    </div>
+    <div style="flex:1">
+      <div class="izin-popup-title" style="color:var(--brown)" id="kasTambahTitle">Tambah Transaksi</div>
+      <div class="izin-popup-name">Isi detail transaksi kas</div>
+    </div>
+    <button onclick="closeKasTambah()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px">✕</button>
+  </div>
+  <div class="izin-popup-body" style="padding:16px">
+    <input type="hidden" id="kasEditId"/>
+    <div class="fr">
+      <label>Jenis Transaksi</label>
+      <div class="seg" style="margin-top:2px">
+        <button class="seg-btn on" id="kasJenisP" onclick="setKasJenis('pemasukan')">Pemasukan</button>
+        <button class="seg-btn" id="kasJenisK" onclick="setKasJenis('pengeluaran')">Pengeluaran</button>
+      </div>
+      <input type="hidden" id="kasJenis" value="pemasukan"/>
+    </div>
+    <div class="fr">
+      <label>Nominal (Rp)</label>
+      <input type="number" id="kasNominal" placeholder="0" min="0" style="width:100%"/>
+    </div>
+    <div class="fr">
+      <label>Tanggal</label>
+      <input type="date" id="kasTanggal" style="width:100%"/>
+    </div>
+    <div class="fr" style="margin-bottom:0">
+      <label>Keterangan</label>
+      <input type="text" id="kasKeterangan" placeholder="cth: Iuran bulanan, Snack..." style="width:100%"/>
+    </div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeKasTambah()">Batal</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="submitKasTambah()">Simpan</button>
+  </div>
+</div>
+
+<!-- EXPORT ANGGOTA POPUP -->
+<div id="expang-overlay" class="izin-overlay" onclick="closeExpAng()"></div>
+<div id="expang-popup" class="izin-popup" style="width:min(420px,95vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-users"/></svg></div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Export Data Anggota</div>
+      <div class="izin-popup-name">Pilih anggota dan periode</div>
+    </div>
+    <button onclick="closeExpAng()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
+  </div>
+  <div class="izin-popup-body" style="max-height:55vh;overflow-y:auto">
+    <div class="exp-date-range" style="margin-bottom:10px">
+      <label class="exp-date-lbl">Pilih Rentang Tanggal</label>
+      <div class="exp-date-row">
+        <input type="date" id="expangDari" class="exp-date-input" placeholder="Dari Tanggal">
+        <span class="exp-date-sep">—</span>
+        <input type="date" id="expangSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <button class="exp-sel-btn" onclick="expangSelAll(true)">Pilih Semua</button>
+      <button class="exp-sel-btn" onclick="expangSelAll(false)">Hapus Semua</button>
+    </div>
+    <div id="expang-list"></div>
+  </div>
+  <div class="izin-popup-footer" style="flex-wrap:wrap;gap:6px">
+    <button class="btn-sec" onclick="closeExpAng()">Batal</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('excel')">Excel</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('csv')">CSV</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="doExpAng('print')">Print</button>
+  </div>
+</div>
+
+<!-- EXPORT GABUNGAN (REKAP + KAS) POPUP -->
+<div id="exgab-overlay" class="izin-overlay" onclick="closeExGab()"></div>
+<div id="exgab-popup" class="izin-popup" style="width:min(380px,94vw)">
+  <div class="izin-popup-header">
+    <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-download"/></svg></div>
+    <div>
+      <div class="izin-popup-title" style="color:var(--green)">Export Rekap + Kas</div>
+      <div class="izin-popup-name">Pilih periode dan jenis kelamin</div>
+    </div>
+    <button onclick="closeExGab()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
+  </div>
+  <div class="izin-popup-body">
+    <label class="exp-date-lbl">Periode</label>
+    <select id="exGabPeriode" class="exp-date-input" style="width:100%;box-sizing:border-box" onchange="exGabPeriodeChanged()">
+      <option value="bulan" selected>Bulan tertentu</option>
+      <option value="tahun">Tahun tertentu</option>
+      <option value="custom">Custom...</option>
+      <option value="semua">Semua data</option>
+    </select>
+    <div class="exp-date-row" id="exGabBulanRow" style="margin-top:8px">
+      <span id="exGabBulanWrap" style="flex:1;display:flex;min-width:0">
+        <select id="exGabBulan" class="exp-date-input">
+          <option value="01">Januari</option><option value="02">Februari</option>
+          <option value="03">Maret</option><option value="04">April</option>
+          <option value="05">Mei</option><option value="06">Juni</option>
+          <option value="07">Juli</option><option value="08">Agustus</option>
+          <option value="09">September</option><option value="10">Oktober</option>
+          <option value="11">November</option><option value="12">Desember</option>
+        </select>
+      </span>
+      <span style="flex:1;display:flex;min-width:0">
+        <select id="exGabTahun" class="exp-date-input">
+          <option value="2025">2025</option><option value="2026">2026</option>
+          <option value="2027">2027</option><option value="2028">2028</option>
+          <option value="2029">2029</option><option value="2030">2030</option>
+        </select>
+      </span>
+    </div>
+    <div class="exp-date-row" id="exGabCustom" style="display:none;margin-top:8px">
+      <input type="date" id="exGabDari" class="exp-date-input" placeholder="Dari Tanggal">
+      <span class="exp-date-sep">—</span>
+      <input type="date" id="exGabSampai" class="exp-date-input" placeholder="Sampai Tanggal">
+    </div>
+    <label class="exp-date-lbl" style="margin-top:10px">Jenis Kelamin</label>
+    <select id="exGabGender" class="exp-date-input" style="width:100%;box-sizing:border-box">
+      <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
+    </select>
+    <label class="exp-date-lbl" style="margin-top:10px">Catatan / Hasil Musyawarah <span style="font-weight:400;text-transform:none;letter-spacing:0">(opsional)</span></label>
+    <textarea id="exGabCatatan" class="exp-date-input" rows="3" placeholder="cth: Hasil musyawarah ditetapkan iuran..." style="width:100%;box-sizing:border-box;resize:vertical;min-height:64px;font-family:inherit"></textarea>
+  </div>
+  <div class="izin-popup-footer" style="flex-wrap:wrap;gap:6px">
+    <button class="btn-sec" onclick="closeExGab()">Batal</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('excel')">Excel</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('csv')">CSV</button>
+    <button class="exp-act-btn" style="background:var(--green)" onclick="eksporGabungan('print')">Print</button>
+  </div>
+</div>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/absen.js"></script>
+<script src="js/rekap.js"></script>
+<script src="js/sesi.js"></script>
+<script src="js/anggota.js"></script>
+<script src="js/kas.js"></script>
+<script src="js/ekspor.js"></script>
+<script src="js/boot.js"></script>
+
+<!-- ACTIVITY LOG POPUP -->
+<div id="log-overlay" class="izin-overlay" onclick="closeActivityLog()"></div>
+<div id="log-popup" class="izin-popup" style="width:min(680px,96vw);max-height:88vh;overflow:hidden;display:none;flex-direction:column">
+  <div class="izin-popup-header" style="flex-shrink:0">
+    <div class="izin-popup-icon" style="background:var(--amber-lt);color:var(--amber)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-clock"/></svg></div>
+    <div style="flex:1">
+      <div class="izin-popup-title" style="color:var(--amber)">Activity Log</div>
+      <div class="izin-popup-name">Riwayat aktivitas pengguna</div>
+    </div>
+    <button onclick="closeActivityLog()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3);padding:4px 6px;margin-left:auto">✕</button>
+  </div>
+  <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;align-items:center">
+    <input type="text" id="logSearch" placeholder="Cari aktivitas..." style="flex:1;min-width:120px;font-size:12px;padding:7px 10px" oninput="renderActivityLogFor('')"/>
+    <select id="logFilter" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:100px">
+      <option value="">Semua</option>
+      <option value="absen">Absensi</option>
+      <option value="kas">Kas</option>
+      <option value="anggota">Anggota</option>
+      <option value="sesi">Sesi</option>
+    </select>
+    <select id="logSort" onchange="renderActivityLogFor('')" style="font-size:12px;padding:6px 8px;width:auto;min-width:110px">
+      <option value="desc">Terbaru Dulu</option>
+      <option value="asc">Terlama Dulu</option>
+    </select>
+  </div>
+  <div style="overflow-y:auto;flex:1;overscroll-behavior:none">
+    <table class="kas-riwayat-table">
+      <thead>
+        <tr>
+          <th>Waktu</th>
+          <th>User</th>
+          <th>Aksi</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody id="logTbody"></tbody>
+    </table>
+    <div id="logEmpty" class="empty" style="display:none">Belum ada aktivitas.</div>
+  </div>
+  <div class="izin-popup-footer">
+    <button onclick="closeActivityLog()">Tutup</button>
+    <button class="btn-p" style="background:var(--brown);border-color:var(--brown)" onclick="logExport()">Export</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="app-toast">...</div>
+
+<script>
+  (function(){
+    var lastY = 0;
+    document.addEventListener('scroll', function(e){
+      if(Math.abs(window.pageYOffset - lastY) > 1){
+        e.preventDefault();
+        window.scrollTo(0, lastY);
+      }
+      lastY = window.pageYOffset;
+    }, {passive: false});
+  })();
+</script>
+</body>
+</html>

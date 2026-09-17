@@ -1,0 +1,127 @@
+/* ══════════════════════════════════
+   SKELETON LOADING
+══════════════════════════════════ */
+.sk-item{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+.sk-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:var(--bg3);animation:skShimmer 1.3s infinite}
+.sk-lines{flex:1;display:flex;flex-direction:column;gap:6px}
+.sk-line{height:10px;border-radius:6px;background:var(--bg3);animation:skShimmer 1.3s infinite}
+.sk-line.short{width:55%}
+.sk-badge{width:56px;height:24px;border-radius:99px;background:var(--bg3);animation:skShimmer 1.3s infinite;flex-shrink:0}
+@keyframes skShimmer{0%{opacity:1} 50%{opacity:.45} 100%{opacity:1}}
+
+/* ══════════════════════════════════
+   IZIN POPUP
+══════════════════════════════════ */
+.izin-overlay{display:none;position:fixed;inset:0;background:rgba(35,48,38,.5);z-index:900;backdrop-filter:blur(2px)}
+.izin-overlay.show{display:block;animation:overlayIn .18s ease-out both}
+.izin-popup{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-54%);z-index:901;
+  background:var(--bg);border-radius:var(--rl);box-shadow:0 12px 40px rgba(40,58,44,.2);
+  width:min(340px,90vw);overflow:hidden}
+.izin-popup.show{display:block;animation:popIn .2s cubic-bezier(.22,.72,0,1) both}
+@keyframes popIn{from{opacity:0;transform:translate(-50%,-50%) scale(.97)} to{opacity:1;transform:translate(-50%,-54%) scale(1)}}
+/* Tutup popup: fade-out singkat + matikan interaksi supaya tidak ada aksi ganda */
+.pop-closing{opacity:0!important;pointer-events:none!important;transition:opacity .15s ease,transform .15s ease!important}
+/* Kotak modal saat ditutup: scale turun sedikit + fade out */
+.izin-popup.pop-closing,.mdet-modal.pop-closing{transform:translate(-50%,-50%) scale(.96)!important}
+.izin-popup-header{display:flex;align-items:center;gap:12px;padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.izin-popup-icon{width:34px;height:34px;border-radius:50%;background:var(--amber-lt);color:var(--amber);
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.izin-popup-icon .ico{width:17px;height:17px}
+.izin-popup-title{font-weight:600;font-size:14px;color:var(--amber)}
+.izin-popup-name{font-size:11px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.izin-popup-body{padding:14px 16px}
+.izin-popup-label{font-size:12px;font-weight:600;color:var(--amber);display:block;margin-bottom:8px}
+.izin-popup-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg2)}
+.izin-save-btn{background:var(--amber)!important;border-color:var(--amber)!important}
+
+/* Update notification popup */
+.update-popup{width:min(360px,92vw)}
+.update-popup-close{
+  background:none;border:none;color:var(--text3);font-size:15px;line-height:1;
+  cursor:pointer;padding:4px 6px;margin-left:auto;flex-shrink:0;transition:color .15s;
+}
+.update-popup-close:hover{color:var(--text)}
+.update-popup-msg{font-size:13px;color:var(--text2);line-height:1.55}
+.update-popup-btn{background:var(--gold);border-color:var(--gold-dk);font-weight:500}
+.update-popup-btn:hover{background:var(--gold-dk)}
+
+/* ══════════════════════════════════
+   TOAST
+   ══════════════════════════════════ */
+#app-toast{
+  position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;
+  transform:translateX(-50%);
+  display:none;align-items:center;gap:9px;
+  background:rgba(31,45,36,.94);color:#ffffff;
+  padding:11px 18px;border-radius:99px;font-size:13px;line-height:1.35;
+  box-shadow:0 8px 28px rgba(20,32,26,.28);
+  z-index:9999;max-width:min(92vw,420px);
+  animation:toastIn .22s ease both;
+}
+#app-toast.toast-hide{animation:toastOut .22s ease both}
+#app-toast::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)} to{opacity:1;transform:translate(-50%,0)}}
+@keyframes toastOut{from{opacity:1;transform:translate(-50%,0)} to{opacity:0;transform:translate(-50%,8px)}}
+
+/* ══════════════════════════════════
+   MEMBER DETAIL MODAL
+══════════════════════════════════ */
+.mdet-overlay{display:none;position:fixed;inset:0;background:rgba(35,48,38,.55);z-index:950;backdrop-filter:blur(3px)}
+.mdet-overlay.show{display:block;animation:overlayIn .18s ease-out both}
+.mdet-modal{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:951;
+  background:var(--bg);border-radius:var(--rxl);box-shadow:0 16px 48px rgba(40,58,44,.25);
+  width:min(520px,95vw);max-height:85vh;overflow:hidden;flex-direction:column}
+.mdet-modal.show{display:flex;animation:mdetIn .2s cubic-bezier(.22,.72,0,1) both}
+@keyframes mdetIn{from{opacity:0;transform:translate(-50%,-50%) scale(.96)} to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* App Popup (pengganti alert/confirm/prompt) harus selalu tampil PALING ATAS,
+   termasuk di atas modal Detail Anggota, supaya tidak ketutup saat dipanggil
+   dari dalam modal lain (mis. tombol Edit/Hapus di Detail Anggota). */
+#app-popup-overlay{z-index:960}
+#app-popup{z-index:961}
+.mdet-header{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mdet-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdet-gender{font-size:11px;color:var(--text2);margin-top:2px}
+.mdet-close{background:none;border:none;font-size:16px;color:var(--text3);cursor:pointer;padding:4px 6px;line-height:1;margin-left:auto;flex-shrink:0}
+.mdet-close:hover{color:var(--text)}
+.mdet-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+.mdet-stat{padding:14px 10px;text-align:center;border-right:1px solid var(--border)}
+.mdet-stat:last-child{border-right:none}
+.mdet-stat-val{font-size:20px;font-weight:700;line-height:1.1}
+.mdet-stat-lbl{font-size:10px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.3px;font-weight:500}
+.mdet-section-title{font-size:11px;font-weight:600;color:var(--text2);padding:10px 18px 6px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;letter-spacing:.3px;text-transform:uppercase}
+.mdet-table-wrap{overflow-y:auto;flex:1}
+.mdet-table{width:100%;border-collapse:collapse;font-size:12px}
+.mdet-table th{background:var(--bg2);color:var(--text2);font-size:10px;font-weight:600;padding:7px 10px;text-align:left;border:none;border-bottom:1px solid var(--border);position:sticky;top:0;letter-spacing:.3px;text-transform:uppercase}
+.mdet-table td{padding:8px 10px;border:none;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.mdet-table tr:last-child td{border-bottom:none}
+.mdet-table tr:hover td{background:var(--bg2)}
+.mdet-footer{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0;flex-wrap:wrap}
+.mdet-close-btn{margin-left:auto}
+.mdet-empty{text-align:center;color:var(--text3);padding:24px;font-size:13px}
+.mdet-filter-bar{display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;align-items:center;flex-wrap:wrap}
+.mdet-filter-bar select{font-size:12px;padding:5px 8px}
+.mdet-sort-btn{white-space:nowrap;font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text2);cursor:pointer;font-family:inherit;flex-shrink:0;transition:all .12s}
+.mdet-sort-btn:hover{background:var(--bg3)}
+.mdet-sort-btn.desc{color:var(--gold-dk);border-color:var(--gold)}
+.mdet-status-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;align-items:center;flex-wrap:wrap}
+.mdet-status-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;margin-right:2px}
+.mdet-sf-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;font-family:inherit;transition:all .12s;opacity:.45}
+.mdet-sf-btn.on{opacity:1}
+.sf-h.on{border-color:var(--green);background:var(--green-lt);color:var(--green)}
+.sf-i.on{border-color:var(--amber);background:var(--amber-lt);color:var(--amber)}
+.sf-a.on{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+.sf-x.on{border-color:var(--border);background:var(--bg3);color:var(--text2)}
+.mdet-sf-reset{font-size:10px;padding:3px 8px;border-radius:99px;border:none;background:none;color:var(--text3);cursor:pointer;font-family:inherit;text-decoration:underline;margin-left:2px}
+.mdet-sf-reset:hover{color:var(--text)}
+
+/* ══════════════════════════════════
+   EXPORT MULTI POPUP
+   ══════════════════════════════════ */
+.exp-check-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;transition:background .12s}
+.exp-check-row:hover{background:var(--bg2)}
+.exp-check-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--gold-dk);flex-shrink:0}
+.exp-sel-btn{font-size:11px;padding:4px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text2)}
+.exp-sel-btn:hover{background:var(--bg3)}
+.exp-act-btn{font-size:12px;padding:7px 14px;background:var(--gold-dk);color:#ffffff;border:none;border-radius:7px;cursor:pointer;font-weight:500}
+.exp-act-btn:hover{opacity:.85}

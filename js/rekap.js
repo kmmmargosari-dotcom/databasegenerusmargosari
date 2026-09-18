@@ -127,6 +127,52 @@ function rekapNote(nama, t){
 // Fungsi murni dari (sL, mAll, rg): dipakai renderRekap untuk layar dan
 // exportPrint untuk cetak, sehingga hasil print selalu sinkron dengan
 // periode yang dipilih di Export (bukan filter halaman Rekap).
+// ── % BULAN LALU + PANAH TREN (per anggota, di samping kolom %) ──
+// prevKeys diturunkan dari sesi pertama sL (bulan kalender sebelumnya),
+// konsisten dengan rekapTrendForRange. Denominator = jumlah sesi bulan lalu
+// (sama cara hitungnya dengan % bulan berjalan = h/sL.length).
+function prevKeysFor(sL){
+  try {
+    if(!sL || !sL.length) return [];
+    var dk = tglDate(sL[0]);
+    var y = parseInt(dk.slice(0, 4), 10), m = parseInt(dk.slice(5, 7), 10);
+    var pm = prevMonthPrefix(m, y);
+    return Object.keys(sesiData).filter(function(t){ return t.startsWith(pm.prefix); }).sort();
+  } catch(e){ return []; }
+}
+// null = tidak ada data bulan lalu (anggota baru / bulan lalu kosong).
+function memberPrevPct(nama, prevKeys){
+  if(!prevKeys || !prevKeys.length) return null;
+  var hasAny = prevKeys.some(function(t){
+    if(((sesiData[t] || {})[nama])) return true;
+    var rs = sesiRoster[t] || [];
+    for(var i = 0; i < rs.length; i++){ if(rs[i] && rs[i].nama === nama) return true; }
+    return false;
+  });
+  if(!hasAny) return null;
+  var h = 0;
+  prevKeys.forEach(function(t){
+    var v = (((sesiData[t] || {})[nama] || {}).status || '');
+    if(v === 'H') h++;
+  });
+  return Math.round(h / prevKeys.length * 100);
+}
+// Sel "bulan lalu": angka % polos (panah tren ada di kolom % berjalan).
+function laluCellHtml(prev){
+  if(prev === null || prev === undefined)
+    return '<td style="color:var(--text3)">—</td>';
+  return '<td style="font-weight:500" title="Bulan lalu ' + prev + '%">' + prev + '%</td>';
+}
+// Panah kecil di samping % berjalan: ▲ hijau naik, ▼ merah turun (vs bulan lalu).
+function trenArrowHtml(prev, cur){
+  if(prev === null || prev === undefined) return '';
+  var d = cur - prev, arrow, color, title;
+  if(d > 0){ arrow = '▲'; color = 'var(--green)'; title = 'Naik +' + d + '% vs bulan lalu (' + prev + '%)'; }
+  else if(d < 0){ arrow = '▼'; color = 'var(--red)'; title = 'Turun ' + d + '% vs bulan lalu (' + prev + '%)'; }
+  else return '';
+  return ' <span style="color:' + color + ';font-size:9px" title="' + title + '">' + arrow + '</span>';
+}
+
 function rekapTheadHtml(sL){
   if(!sL.length) return '';
   var hd='<tr><th class="rx-no">No</th><th class="rx-nama">Nama</th>';
@@ -135,22 +181,23 @@ function rekapTheadHtml(sL){
     var tip=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' • '+HARI[d.getDay()]+(sesiKet[t]?' • '+sesiKet[t]:'');
     hd+='<th title="'+escHtml(tip)+'">'+d.getDate()+'</th>';
   });
-  hd+='<th>H</th><th>I</th><th>A</th><th>%</th></tr>';
+  hd+='<th>H</th><th>I</th><th>A</th><th>%</th><th title="Persentase bulan lalu (panah tren ada di kolom %)">Bulan Lalu</th></tr>';
   var kg='<tr style="background:var(--gold-xlt)"><td style="font-size:9px;color:var(--text3);font-weight:500;letter-spacing:.3px;text-transform:uppercase">Keg.</td><td style="text-align:left;font-size:9px;color:var(--text3)">—</td>';
   sL.forEach(function(t){
     var ket=sesiKet[t]||'';
     kg+='<td style="font-size:9px;color:var(--gold-dk);font-weight:500;max-width:80px;overflow:hidden;text-overflow:ellipsis" title="'+ket.replace(/"/g,'&quot;')+'">'+
       (ket.length>8?ket.substring(0,7)+'…':ket||'—')+'</td>';
   });
-  kg+='<td colspan="4" style="background:var(--gold-xlt)"></td></tr>';
+  kg+='<td colspan="5" style="background:var(--gold-xlt)"></td></tr>';
   return hd+kg;
 }
 
 function rekapTbodyHtml(sL, mAll, rg){
-  if(!sL.length) return '<tr><td colspan="'+(6+sL.length)+'" class="empty">Belum ada data.</td></tr>';
+  if(!sL.length) return '<tr><td colspan="'+(7+sL.length)+'" class="empty">Belum ada data.</td></tr>';
   var bd='';
   var noCount=0;
   var cab = (typeof isCaberawit === 'function') ? isCaberawit() : false;
+  var _prevKeys = prevKeysFor(sL);
   function rowHtml(m){
     noCount++;
     var h=0,iz=0,al=0,cells='';
@@ -169,17 +216,19 @@ function rekapTbodyHtml(sL, mAll, rg){
     var pct=sL.length?Math.round(h/sL.length*100):0;
     var pc=pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
     var namaCell = escHtml(m.nama);
+    var _prev = memberPrevPct(m.nama, _prevKeys);
     return '<tr><td>'+noCount+'</td><td class="tl">'+namaCell+'</td>'+cells+
       '<td style="color:var(--green);font-weight:500">'+h+'</td>'+
       '<td style="color:var(--amber)">'+iz+'</td><td style="color:var(--red)">'+al+'</td>'+
-      '<td style="color:'+pc+';font-weight:500">'+pct+'%</td></tr>';
+      '<td style="color:'+pc+';font-weight:500">'+pct+'%'+trenArrowHtml(_prev, pct)+'</td>'+
+      laluCellHtml(_prev)+'</tr>';
   }
   // ── CABERAWIT: URUT per kelas (PAUD → Tilawati 1..6 → Al-Quran) ──
   // Filter gender (rg) tetap dihormati di dalam tiap kelas.
   if(cab){
     var groups = groupByKelas(mAll);
     groups.forEach(function(g){
-      bd += '<tr class="gender-sep kelas-sep-row"><td colspan="'+(6+sL.length)+'">'+escHtml(kelasLabel(g.kelas))+' • '+g.items.length+' anak</td></tr>';
+      bd += '<tr class="gender-sep kelas-sep-row"><td colspan="'+(7+sL.length)+'">'+escHtml(kelasLabel(g.kelas))+' • '+g.items.length+' anak</td></tr>';
       g.items.forEach(function(m){ bd += rowHtml(m); });
     });
     return bd;
@@ -188,7 +237,7 @@ function rekapTbodyHtml(sL, mAll, rg){
     if(!arr.length) return;
     if(rg==='S'){
       var _sepLbl = genderLabel==='P' ? 'Perempuan' : genderLabel==='L' ? 'Laki-laki' : 'Data Lama';
-      bd+='<tr class="gender-sep '+sepClass+'"><td colspan="'+(6+sL.length)+'">'+_sepLbl+'</td></tr>';
+      bd+='<tr class="gender-sep '+sepClass+'"><td colspan="'+(7+sL.length)+'">'+_sepLbl+'</td></tr>';
     }
     arr.forEach(function(m){
       noCount++;
@@ -207,10 +256,12 @@ function rekapTbodyHtml(sL, mAll, rg){
       });
       var pct=sL.length?Math.round(h/sL.length*100):0;
       var pc=pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)';
+      var _prev2 = memberPrevPct(m.nama, _prevKeys);
       bd+='<tr><td>'+noCount+'</td><td class="tl">'+escHtml(m.nama)+'</td>'+cells+
         '<td style="color:var(--green);font-weight:500">'+h+'</td>'+
         '<td style="color:var(--amber)">'+iz+'</td><td style="color:var(--red)">'+al+'</td>'+
-        '<td style="color:'+pc+';font-weight:500">'+pct+'%</td></tr>';
+        '<td style="color:'+pc+';font-weight:500">'+pct+'%'+trenArrowHtml(_prev2, pct)+'</td>'+
+        laluCellHtml(_prev2)+'</tr>';
     });
   }
   if(rg==='S'){
@@ -552,12 +603,13 @@ function buildRekapRows(sL, mAll){
     }
   } catch(e){}
   var thirdCol = cab ? 'Kelas' : 'Gender';
-  var ketRow=['','Kegiatan',''].concat(sL.map(function(t){ return sesiKet[t]||''; })).concat(['','','','']);
-  if(cab) ketRow = ['','Kegiatan',''].concat(sL.map(function(t){ return sesiKet[t]||''; })).concat(['','','','']);
+  var _prevKeys = prevKeysFor(sL);
+  var ketRow=['','Kegiatan',''].concat(sL.map(function(t){ return sesiKet[t]||''; })).concat(['','','','','']);
+  if(cab) ketRow = ['','Kegiatan',''].concat(sL.map(function(t){ return sesiKet[t]||''; })).concat(['','','','','']);
   var hdrs=['No','Nama',thirdCol].concat(sL.map(function(t){
     var d=new Date(tglDate(t)+'T00:00:00');
     return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
-  })).concat(['Hadir','Izin','Alfa','% Hadir']);
+  })).concat(['Hadir','Izin','Alfa','% Hadir','% Bulan Lalu']);
   var rows=[ketRow,hdrs];
   var lastKelas = null;
   ordered.forEach(function(m,i){
@@ -572,15 +624,17 @@ function buildRekapRows(sL, mAll){
       return v||'-';
     });
     var pct=sL.length?Math.round(h/sL.length*100):0;
+    var prev=memberPrevPct(m.nama, _prevKeys);
+    var prevTxt=(prev===null||prev===undefined)?'-':(prev+'%'+(prev<pct?' (naik)':prev>pct?' (turun)':' (stabil)'));
     var third = cab ? (m.kelas||'Tanpa Kelas') : (m.gender==='P'?'Perempuan':m.gender==='L'?'Laki-laki':'Riwayat');
     if(cab){
       var kk = m.kelas || '';
       if(kk !== lastKelas){
         lastKelas = kk;
-        rows.push(['', ('KELAS: ' + kelasLabel(kk)).toUpperCase(), ''].concat(sL.map(function(){return '';})).concat(['','','','']));
+        rows.push(['', ('KELAS: ' + kelasLabel(kk)).toUpperCase(), ''].concat(sL.map(function(){return '';})).concat(['','','','','']));
       }
     }
-    rows.push([rows.length - 1,m.nama,third].concat(cells).concat([h,iz,al,pct+'%']));
+    rows.push([rows.length - 1,m.nama,third].concat(cells).concat([h,iz,al,pct+'%',prevTxt]));
   });
   // Nomor ulang (baris separator kelas tidak dihitung)
   var no = 0;
@@ -659,7 +713,7 @@ function xlNeat(ws, widths, headerRow){
 function writeRekapExcel(d, o, fname){
   var wb=XLSX.utils.book_new();
   var wsR=XLSX.utils.aoa_to_sheet(buildRekapRows(d.sL,d.mAll));
-  xlNeat(wsR, [6,24,12].concat(d.sL.map(function(){return 12;})).concat([8,8,8,10]), 1);
+  xlNeat(wsR, [6,24,12].concat(d.sL.map(function(){return 12;})).concat([8,8,8,10,12]), 1);
   XLSX.utils.book_append_sheet(wb,wsR,'Rekap');
   if(o.stat)
     XLSX.utils.book_append_sheet(wb,xlNeat(XLSX.utils.aoa_to_sheet(buildInsightRows(d.sL,d.mAll)),[28,22]),'Ringkasan');

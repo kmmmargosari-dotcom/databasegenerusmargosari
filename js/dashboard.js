@@ -2,7 +2,34 @@
 // DASHBOARD
 // ══════════════════════════════════════════════════
 
+// Rentang grafik dashboard: '1' = Bulan Ini, '3' = 3 Bulan terakhir, '12' = Tahun Ini.
+// KPI "Ringkasan Bulan Ini" tetap bulanan — yang berubah hanya grafik + legend + subtitlenya.
+var dashRange = '1';
+
+function setDashRange(r){
+  dashRange = (r === '3' || r === '12') ? r : '1';
+  try { renderDashboard(); } catch(e){}
+}
+
+function dashRangePrefixes(){
+  var now = new Date();
+  if(dashRange === '12'){
+    return { keys: [String(now.getFullYear())], label: 'Tahun ' + now.getFullYear() };
+  }
+  if(dashRange === '3'){
+    var out = [];
+    for(var i = 2; i >= 0; i--){
+      var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      out.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'));
+    }
+    return { keys: out, label: '3 Bulan Terakhir' };
+  }
+  var cur = String(now.getMonth() + 1).padStart(2, '0');
+  return { keys: [now.getFullYear() + '-' + cur], label: 'Bulan Ini' };
+}
+
 function renderDashboard(){
+  dashRange = '1'; // kunci Bulan Ini saja (filter 3 Bulan/Tahun Ini dimatikan)
   var now      = new Date();
   var curMonth = String(now.getMonth()+1).padStart(2,'0');
   var curYear  = String(now.getFullYear());
@@ -26,13 +53,24 @@ function renderDashboard(){
       else if(s==='A'){ totalAlpa++; sA++; }
     });
     var datePart = key.split('_')[0];
-    var day  = parseInt((datePart.split('-')[2])||'1', 10);
+    var dparts = datePart.split('-');
+    var day  = parseInt(dparts[2]||'1', 10);
+    var mon  = parseInt(dparts[1]||'1', 10);
     var ket  = sesiKet[key]||'';
     // Label sumbu-X memakai tanggal singkat; nama kegiatan lengkap ditampilkan
     // via tooltip (tap/hover titik & label grafik).
     var label = ket ? (ket+' ('+day+')') : String(day);
-    sesiStats.push({label:label, day:day, ket:ket, H:sH, I:sI, A:sA});
+    sesiStats.push({label:label, day:day, mon:mon, dateKey:datePart, ket:ket, H:sH, I:sI, A:sA});
   });
+
+  // ── Grafik mengikuti dashRange (Bulan Ini / 3 Bulan / Tahun Ini) ──
+  // KPI + Kegiatan Terbaru tetap ringkasan bulan berjalan.
+  var _rg = dashRangePrefixes();
+  var chartStats = sesiStats.filter(function(s){
+    return _rg.keys.some(function(p){ return (s.dateKey||'').startsWith(p); });
+  });
+  var cH = 0, cI = 0, cA = 0;
+  chartStats.forEach(function(s){ cH += s.H; cI += s.I; cA += s.A; });
 
   var totalPossible = kegiatanBulanIni * (totalGenerus||1);
   var persen = kegiatanBulanIni>0 ? Math.round((totalHadir/totalPossible)*100) : 0;
@@ -58,11 +96,17 @@ function renderDashboard(){
   setTxt('dash-persen-mob',  persen+'%');
   setTxt('dash-hadir-mob',   totalHadir);
 
-  var chartSvg = buildDashChart(sesiStats);
+  var chartSvg = buildDashChart(chartStats, _rg.label);
   ['dash-chart-pc','dash-chart-mob'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.innerHTML = chartSvg;
   });
+  // Sinkron status pil Bulan Ini / 3 Bulan / Tahun Ini (PC + mobile).
+  try {
+    document.querySelectorAll('[data-dashrange]').forEach(function(b){
+      if(b.classList) b.classList.toggle('on', b.getAttribute('data-dashrange') === dashRange);
+    });
+  } catch(e){}
 
   var recentKeys = monthKeys.slice().reverse().slice(0,3);
   var MBLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
@@ -132,15 +176,15 @@ function renderDashboard(){
     var kapTxt = totalHadir+' / '+totalPossible+' kapasitas';
     ['lux-kapas-mob','lux-kapas-pc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=kapTxt; });
     ['lux-progress-mob','lux-progress-pc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.style.width=Math.min(100,persen)+'%'; });
-    [['lux-leg-h',totalHadir],['lux-leg-h-pc',totalHadir],['lux-leg-i',totalIzin],['lux-leg-i-pc',totalIzin],['lux-leg-a',totalAlpa],['lux-leg-a-pc',totalAlpa]].forEach(function(p){ var e=document.getElementById(p[0]); if(e) e.textContent=p[1]; });
-    var subTxt = sesiStats.length ? ('Analisis tren '+sesiStats.length+' sesi bulan ini') : 'Belum ada sesi bulan ini';
+    [['lux-leg-h',cH],['lux-leg-h-pc',cH],['lux-leg-i',cI],['lux-leg-i-pc',cI],['lux-leg-a',cA],['lux-leg-a-pc',cA]].forEach(function(p){ var e=document.getElementById(p[0]); if(e) e.textContent=p[1]; });
+    var subTxt = chartStats.length ? ('Analisis tren '+chartStats.length+' sesi • '+_rg.label) : ('Belum ada sesi pada '+_rg.label);
     ['lux-chart-sub','lux-chart-sub-pc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=subTxt; });
     // Catatan kaki grafik: sesi dengan Hadir tertinggi
     var noteTxt;
-    if(sesiStats.length){
-      var bi=0; sesiStats.forEach(function(s,i){ if(s.H>sesiStats[bi].H) bi=i; });
-      noteTxt = 'Kehadiran tertinggi pada <strong>Sesi '+(bi+1)+' ('+sesiStats[bi].H+' Hadir)</strong>. Rata-rata izin '+(kegiatanBulanIni?Math.round(totalIzin/kegiatanBulanIni*10)/10:0)+' org/sesi.';
-    } else noteTxt = 'Data grafik akan muncul setelah ada sesi bulan ini.';
+    if(chartStats.length){
+      var bi=0; chartStats.forEach(function(s,i){ if(s.H>chartStats[bi].H) bi=i; });
+      noteTxt = 'Kehadiran tertinggi pada <strong>'+escHtml(chartXLabel(chartStats[bi], bi))+' ('+chartStats[bi].H+' Hadir)</strong>. Rata-rata izin '+(chartStats.length?Math.round(cI/chartStats.length*10)/10:0)+' org/sesi • '+_rg.label+'.';
+    } else noteTxt = 'Data grafik akan muncul setelah ada sesi pada '+_rg.label+'.';
     ['lux-chart-note','lux-chart-note-pc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.innerHTML='<span class="msym" style="font-size:14px;vertical-align:-2px;color:#2d6a4f">info</span> '+noteTxt; });
     // Tren vs bulan lalu
     var prevD = new Date(now.getFullYear(), now.getMonth()-1, 1);
@@ -231,11 +275,23 @@ function renderDashKasSummary(){
   if(hsPc) hsPc.textContent = sesiTxt;
 }
 
-// Grafik dashboard persis acuan: area gradien + garis tebal + marker putih + label "Sesi N".
-function buildDashChart(sesiStats){
+// Label sumbu-X grafik: "Sesi N" untuk 1 bulan, "d/M" untuk 3 bulan / tahun.
+function chartXLabel(s, i){
+  try {
+    if(typeof dashRange !== 'undefined' && dashRange !== '1' && s && s.dateKey){
+      var p = String(s.dateKey).split('-');
+      return (parseInt(p[2], 10) || s.day) + '/' + (parseInt(p[1], 10) || s.mon || '');
+    }
+  } catch(e){}
+  return 'Sesi ' + (i + 1);
+}
+
+// Grafik dashboard persis acuan: area gradien + garis tebal + marker putih.
+function buildDashChart(sesiStats, rangeLabel){
   if(!sesiStats||!sesiStats.length){
+    var emptyTxt = 'Belum ada sesi' + (rangeLabel ? ' • ' + rangeLabel : '');
     return '<div style="overflow-x:auto"><svg viewBox="0 0 500 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:300px;height:auto;display:block">'+
-      '<text x="250" y="100" text-anchor="middle" font-size="12" fill="#9ca3af">Belum ada sesi bulan ini</text></svg></div>';
+      '<text x="250" y="100" text-anchor="middle" font-size="12" fill="#9ca3af">'+emptyTxt.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text></svg></div>';
   }
   var H_arr = sesiStats.map(function(s){ return s.H; });
   var I_arr = sesiStats.map(function(s){ return s.I; });
@@ -295,14 +351,14 @@ function buildDashChart(sesiStats){
     var x = tx(i).toFixed(1);
     return '<line x1="'+x+'" y1="'+pT+'" x2="'+x+'" y2="'+baseY+'" stroke="#e8e6df" stroke-width="1"/>'+
       '<text x="'+x+'" y="'+(H_-8)+'" text-anchor="middle" font-size="11" font-weight="600" fill="#4b5563" font-family="\'Plus Jakarta Sans\',sans-serif">'+
-      '<title>'+escHtml(fullStatLabel(s))+'</title>Sesi '+(i+1)+'</text>';
+      '<title>'+escHtml(fullStatLabel(s))+'</title>'+escHtml(chartXLabel(s,i))+'</text>';
   }).join('');
 
   var areas = SERIES.map(function(s){ var d=areaPath(s.vals); return d ? '<path d="'+d+'" fill="url(#'+s.grad+')"></path>' : ''; }).join('');
   var lines = SERIES.map(function(s){ var d=linePath(s.vals); return d ? '<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-linecap="round" stroke-width="3"></path>' : ''; }).join('');
   var dots = SERIES.map(function(s){
     return s.vals.map(function(v,i){
-      var t = 'Sesi '+(i+1)+': '+s.name+' '+v+' Generus';
+      var t = chartXLabel(sesiStats[i],i)+': '+s.name+' '+v+' Generus';
       return '<circle class="chart-marker" cx="'+tx(i).toFixed(1)+'" cy="'+ty(v).toFixed(1)+'" fill="#ffffff" r="5" stroke="'+s.color+'" stroke-width="2.5"><title>'+escHtml(t)+'</title></circle>';
     }).join('');
   }).join('');

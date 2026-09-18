@@ -238,6 +238,50 @@ function editNamaAnggota(){
   }, {title:'Ubah Nama Anggota', icon:'edit', color:'gold'});
 }
 
+// Pindahkan anggota ke gender lain (Perempuan <-> Laki-laki).
+// Riwayat rekap lama TIDAK berubah (dibangun dari roster snapshot sesi);
+// gender baru berlaku untuk tampilan & sesi yang dibuat setelah ini.
+function editGenderAnggota(){
+  if(!_mdetNama) return;
+  var idx = members.findIndex(function(m){ return m.nama === _mdetNama; });
+  if(idx < 0) return;
+  var cur = members[idx].gender === 'P' ? 'P' : 'L';
+  var next = cur === 'P' ? 'L' : 'P';
+  var nama = members[idx].nama;
+  appConfirm('Ubah gender '+nama+' dari '+glabel(cur)+' ke '+glabel(next)+
+    '?\n\nDaftar, absensi, dan rekap berikutnya ikut berubah. Riwayat sesi lama tidak diubah.',
+    function(){
+    var i2 = members.findIndex(function(m){ return m.nama === nama; });
+    if(i2 < 0) return;
+    var lama = members[i2].gender === 'P' ? 'P' : 'L';
+    var baru = lama === 'P' ? 'L' : 'P';
+    if(lama === baru) return;
+    members[i2].gender = baru;
+    var cab = (typeof isCaberawit === 'function') ? isCaberawit() : false;
+    members.sort(function(a,b){
+      if(cab && typeof sortByKelasNama === 'function') return sortByKelasNama(a,b);
+      if(a.gender===b.gender) return a.nama.localeCompare(b.nama);
+      return a.gender==='P' ? -1 : 1;
+    });
+    fbSaveAnggota();
+    logActivity('anggota', 'Ubah gender '+nama+': '+glabel(lama)+' → '+glabel(baru));
+    var av = document.getElementById('mdet-avatar');
+    if(av){ av.className = 'avatar ' + (baru==='P'?'av-p':'av-l'); }
+    var gEl = document.getElementById('mdet-gender');
+    if(gEl){
+      var mm = members[i2];
+      var txt = glabel(baru);
+      try {
+        if((typeof isCaberawit === 'function') && isCaberawit() && mm.kelas) txt += ' • ' + mm.kelas;
+      } catch(e){}
+      gEl.textContent = txt;
+    }
+    renderAnggota(); renderAnggotaMob();
+    try { renderDashboard(); } catch(e){}
+    showToast('Gender diperbarui: '+glabel(baru));
+  }, {title:'Ubah Gender', icon:'edit', color:'gold', okText:'Ya, Ubah'});
+}
+
 // Pindahkan anggota Caberawit ke kelas lain (PAUD / Tilawati 1-6 / Al-Quran).
 // Riwayat rekap lama TIDAK berubah (dibangun dari roster snapshot sesi);
 // kelas baru berlaku untuk sesi yang dibuat setelah ini.

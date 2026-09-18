@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { initializeFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeFirestore, getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -25,9 +25,23 @@
     };
 
     const app  = initializeApp(firebaseConfig);
-    const db   = initializeFirestore(app, {
-      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-    });
+    // Firestore init anti-gagal (penting untuk Incognito/Private mode):
+    // multi-tab persistent -> single-tab persistent -> memory-only.
+    // firebase-ready SELALU di-dispatch supaya boot.js tidak timeout selamanya.
+    let db = null;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+      });
+    } catch(e1) {
+      console.warn('Firestore multi-tab cache gagal, coba single-tab:', e1);
+      try {
+        db = initializeFirestore(app, { localCache: persistentLocalCache() });
+      } catch(e2) {
+        console.warn('Firestore persistent cache gagal, pakai memory:', e2);
+        db = getFirestore(app);
+      }
+    }
     const auth = getAuth(app);
 
     window._db  = db;
@@ -1803,6 +1817,7 @@
     <button onclick="exportMemberCSV()">CSV</button>
     <button onclick="exportMemberPrint()">Print</button>
     <button onclick="editNamaAnggota()">Edit Nama</button>
+    <button onclick="editGenderAnggota()">Ubah Gender</button>
     <button id="mdet-kelas-btn" onclick="editKelasAnggota()" style="display:none;color:var(--green);border-color:var(--green);background:var(--green-lt)">Pindah Kelas</button>
     <button id="mdet-arsip-btn" onclick="arsipToggleAnggota()" style="color:var(--gold-dk);border-color:var(--gold);background:var(--gold-xlt)">Arsipkan</button>
     <button class="btn-danger" onclick="hapusAnggotaFromDetail()" style="margin-left:auto">Hapus</button>

@@ -437,67 +437,245 @@ function kasDelTrx(id){
 // Rekap+Kas di rekap.js supaya desainnya sama persis.
 // Parameter ke-7 (opsional, hanya dipakai export gabungan): teks catatan
 // musyawarah. Bila diisi, tabel Detail Transaksi + kartu catatan tampil
-// berdampingan (kiri-kanan); bila kosong, tabel tampil full seperti biasa.
+// ── SECTION LAPORAN KAS UNTUK CETAK ──
+// Dipakai export kas standalone (portrait) MAUPUN tertanam di dokumen
+// rekap landscape (gabungan + semua kelompok): markup fleksibel (wrap)
+// sehingga rapi di keduanya. Struktur: ringkasan 5 kartu (Saldo Akhir
+// ditonjolkan SEKALI) + donat komposisi tunggal + tabel detail +
+// catatan full-width di bawah tabel. Perhitungan tidak diubah.
 function kasPrintSectionHtml(periodItems, saldoAwal, totalMasuk, totalKeluar, selisih, saldoAkhir, catatan){
+  function mini(title, val, color, bg, bd){
+    return '<div class="ks-mini" style="background:'+bg+';border:1px solid '+bd+'">'+
+      '<div class="ks-mini-t">'+title+'</div>'+
+      '<div class="ks-mini-v" style="color:'+color+'">'+val+'</div></div>';
+  }
+  var sumHtml='<div class="ks-sum">'+
+    mini('Saldo Awal', fmtRp(saldoAwal), '#1f2937', '#fbf9f6', '#e8e6df')+
+    mini('Total Pemasukan', '+'+fmtRp(totalMasuk), '#2d6a4f', '#ebf5f0', '#c1ecd4')+
+    mini('Total Pengeluaran', '−'+fmtRp(totalKeluar), '#ba1a1a', '#fff1f2', '#ffdad6')+
+    mini('Selisih', (selisih<0?'−':'+')+fmtRp(Math.abs(selisih)), selisih>=0?'#2d6a4f':'#ba1a1a', '#fbf9f6', '#e8e6df')+
+    '<div class="ks-mini ks-hero" style="background:#ebf5f0;border:1px solid #1b4332">'+
+      '<div class="ks-mini-t" style="color:#1b4332">Saldo Akhir</div>'+
+      '<div class="ks-mini-v" style="color:#1b4332">'+fmtRp(saldoAkhir)+'</div></div>'+
+  '</div>';
   var donutR=54,donutCx=70,donutCy=70,donutW=14;
   var donutTotal=totalMasuk+totalKeluar;
-  var donutSvg='';
+  var donutHtml='';
   if(donutTotal>0){
     var pctMasuk=totalMasuk/donutTotal,pctKeluar=totalKeluar/donutTotal;
     var circ=2*Math.PI*donutR;
     var dashM=pctMasuk*circ,gapM=circ-dashM,dashK=pctKeluar*circ,gapK=circ-dashK,rotateK=-90+pctMasuk*360;
-    donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">'+
+    donutHtml='<div class="ks-donut"><div class="ks-donut-ttl">Komposisi Periode</div>'+
+      '<svg width="120" height="120" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">'+
       '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#e8e6df" stroke-width="'+donutW+'"/>'+
       '<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#2d6a4f" stroke-width="'+donutW+'" stroke-dasharray="'+dashM+' '+gapM+'" transform="rotate(-90 '+donutCx+' '+donutCy+')" stroke-linecap="round"/>'+
       (totalKeluar>0?'<circle cx="'+donutCx+'" cy="'+donutCy+'" r="'+donutR+'" fill="none" stroke="#ba1a1a" stroke-width="'+donutW+'" stroke-dasharray="'+dashK+' '+gapK+'" transform="rotate('+rotateK+' '+donutCx+' '+donutCy+')" stroke-linecap="round"/>':'')+
-      '<text x="'+donutCx+'" y="'+(donutCy-5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">'+Math.round(pctMasuk*100)+'%</text>'+
-      '<text x="'+donutCx+'" y="'+(donutCy+10)+'" text-anchor="middle" font-size="9" fill="#717973">Masuk</text>'+
-      '</svg>';
-  } else {
-    donutSvg='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><circle cx="70" cy="70" r="54" fill="none" stroke="#e8e6df" stroke-width="14"/><text x="70" y="75" text-anchor="middle" font-size="11" fill="#717973">Kosong</text></svg>';
+      '<text x="'+donutCx+'" y="'+(donutCy-2)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">'+Math.round(pctMasuk*100)+'%</text>'+
+      '<text x="'+donutCx+'" y="'+(donutCy+13)+'" text-anchor="middle" font-size="9" fill="#717973">Masuk</text>'+
+      '</svg>'+
+      '<div class="ks-donut-legend">'+
+      (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2d6a4f"></div><span class="donut-leg-lbl">Pemasukan (+)</span><span class="donut-leg-val" style="color:#2d6a4f">'+fmtRp(totalMasuk)+'</span></div>':'')+
+      (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#ba1a1a"></div><span class="donut-leg-lbl">Pengeluaran (−)</span><span class="donut-leg-val" style="color:#ba1a1a">'+fmtRp(totalKeluar)+'</span></div>':'')+
+      '</div></div>';
   }
   var rows='',rowNo=1;
   rows+='<tr class="saldo-awal-row"><td colspan="2" style="font-style:italic;color:#4b5563;font-size:10.5px">Saldo Awal Periode</td><td></td><td></td><td class="num bold" style="color:#b45309">'+fmtRp(saldoAwal)+'</td></tr>';
   periodItems.forEach(function(item){
     var trx=item.trx;
-    var masuk =trx.jenis==='pemasukan'   ?fmtRp(trx.nominal):'-';
-    var keluar=trx.jenis==='pengeluaran' ?fmtRp(trx.nominal):'-';
+    var masuk =trx.jenis==='pemasukan'   ?'+'+fmtRp(trx.nominal):'-';
+    var keluar=trx.jenis==='pengeluaran' ?'−'+fmtRp(trx.nominal):'-';
     var shade=rowNo%2===0?'background:#fbf9f6':'';
-    rows+='<tr style="'+shade+'"><td style="white-space:nowrap;font-size:10.5px">'+fmtTglShort(trx.tanggal)+'</td><td style="font-size:10.5px">'+escHtml(trx.keterangan||'')+'</td><td class="num green" style="font-size:10.5px">'+masuk+'</td><td class="num red" style="font-size:10.5px">'+keluar+'</td><td class="num bold" style="font-size:10.5px">'+fmtRp(item.saldo)+'</td></tr>';
+    rows+='<tr style="'+shade+'"><td style="white-space:nowrap;font-size:10.5px">'+fmtTglShort(trx.tanggal)+'</td><td class="ks-ket">'+escHtml(trx.keterangan||'')+'</td><td class="num green" style="font-size:10.5px">'+masuk+'</td><td class="num red" style="font-size:10.5px">'+keluar+'</td><td class="num bold" style="font-size:10.5px">'+fmtRp(item.saldo)+'</td></tr>';
     rowNo++;
   });
-  return '<div class="cf-donut-row"><div class="cf-box"><div class="cf-box-title">Cash Flow Periode</div>'+
-    '<div class="cf-row"><div class="cf-icon" style="background:#e8e6df;color:#4b5563">●</div><span class="cf-lbl">Saldo Awal</span><span class="cf-val" style="color:#1f2937">'+fmtRp(saldoAwal)+'</span></div>'+
-    '<div class="cf-row"><div class="cf-icon" style="background:#ebf5f0;color:#2d6a4f">▲</div><span class="cf-lbl">Total Pemasukan</span><span class="cf-val" style="color:#2d6a4f">'+fmtRp(totalMasuk)+'</span></div>'+
-    '<div class="cf-row"><div class="cf-icon" style="background:#fee2e2;color:#ba1a1a">▼</div><span class="cf-lbl">Total Pengeluaran</span><span class="cf-val" style="color:#ba1a1a">'+fmtRp(totalKeluar)+'</span></div>'+
-    '<div class="cf-row"><div class="cf-icon" style="background:#fef3c7;color:#b45309">＝</div><span class="cf-lbl">Selisih</span><span class="cf-val" style="color:'+(selisih>=0?'#2d6a4f':'#ba1a1a')+'">'+fmtRp(selisih)+'</span></div>'+
-    '<div class="cf-saldo-akhir"><span class="cf-sa-lbl">Saldo Akhir</span><span class="cf-sa-val">'+fmtRp(saldoAkhir)+'</span></div></div>'+
-    '<div class="donut-box"><div class="donut-box-title">Komposisi</div>'+donutSvg+
-    '<div class="donut-legend">'+
-    (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2d6a4f"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#2d6a4f">'+fmtRp(totalMasuk)+'</span></div>':'')+
-    (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#ba1a1a"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#ba1a1a">'+fmtRp(totalKeluar)+'</span></div>':'')+
-    '<div class="cf-saldo-akhir"><span class="cf-sa-lbl">Saldo Akhir</span><span class="cf-sa-val">'+fmtRp(saldoAkhir)+'</span></div></div>'+
-    '<div class="donut-box"><div class="donut-box-title">Komposisi</div>'+donutSvg+
-    '<div class="donut-legend">'+
-    (totalMasuk>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#2d6a4f"></div><span class="donut-leg-lbl">Pemasukan</span><span class="donut-leg-val" style="color:#2d6a4f">'+fmtRp(totalMasuk)+'</span></div>':'')+
-    (totalKeluar>0?'<div class="donut-leg-row"><div class="donut-dot" style="background:#ba1a1a"></div><span class="donut-leg-lbl">Pengeluaran</span><span class="donut-leg-val" style="color:#ba1a1a">'+fmtRp(totalKeluar)+'</span></div>':'')+
-    '</div></div></div>'+
-    kasDetailTableHtml(rows, totalMasuk, totalKeluar, saldoAkhir, catatan||'');
+  var tableHtml='<div class="section-title">Detail Transaksi</div>'+
+    '<table class="ks-table"><thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right">Masuk (Rp)</th><th style="text-align:right">Keluar (Rp)</th><th style="text-align:right">Saldo (Rp)</th></tr></thead>'+
+    '<tbody>'+rows+
+    '<tr class="total-row"><td colspan="2">TOTAL PERIODE</td><td class="num green">+'+fmtRp(totalMasuk)+'</td><td class="num red">−'+fmtRp(totalKeluar)+'</td><td class="num bold">'+fmtRp(saldoAkhir)+'</td></tr>'+
+    '</tbody></table>';
+  var noteHtml='';
+  if(catatan){
+    var _ct=escHtml(catatan).replace(/\r\n/g,'\n').replace(/\n/g,'<br>');
+    noteHtml='<div class="section-title">Catatan / Hasil Musyawarah</div>'+
+      '<div class="tbl-card ks-note"><div class="catatan-text">'+_ct+'</div></div>';
+  }
+  return sumHtml+donutHtml+tableHtml+noteHtml;
 }
 
-function kasDetailTableHtml(rows, totalMasuk, totalKeluar, saldoAkhir, catatan){
-  var tableHtml='<div class="section-title">Detail Transaksi</div>'+
-    '<table><thead><tr><th>Tanggal</th><th>Keterangan</th><th style="text-align:right">Masuk (Rp)</th><th style="text-align:right">Keluar (Rp)</th><th style="text-align:right">Saldo (Rp)</th></tr></thead>'+
-    '<tbody>'+rows+
-    '<tr class="total-row"><td colspan="2">TOTAL PERIODE</td><td class="num green">'+fmtRp(totalMasuk)+'</td><td class="num red">'+fmtRp(totalKeluar)+'</td><td class="num bold">'+fmtRp(saldoAkhir)+'</td></tr>'+
-    '</tbody></table>';
-  if(!catatan) return tableHtml;
-  var _ct=escHtml(catatan).replace(/\r\n/g,'\n').replace(/\n/g,'<br>');
-  return '<div class="kas-detail-row">'+
-    '<div class="kas-detail-main">'+tableHtml+'</div>'+
-    '<div class="kas-detail-side"><div class="section-title">Catatan / Hasil Musyawarah</div>'+
-    '<div class="tbl-card catatan-card-side"><div class="catatan-text">'+_ct+'</div></div></div>'+
+// ── LAPORAN KAS MODEL STITCH (A4 landscape) ──
+// Khusus kasExport 'print'. Seluruh angka berasal dari parameter (perhitungan
+// kasExport/kasCalcRunning yang tidak diubah). Tanpa Tailwind/CDN, tanpa
+// media-query responsif: layout tetap flex/grid persen agar aman di iframe
+// print dan pagination (>1 halaman: tabel lanjut lebar penuh).
+function kasBuildLaporanHtml(o){
+  var periodItems = o.periodItems || [];
+  var saldoAwal = o.saldoAwal || 0, totalMasuk = o.totalMasuk || 0;
+  var totalKeluar = o.totalKeluar || 0, selisih = o.selisih || 0;
+  var saldoAkhir = o.saldoAkhir || 0, catatan = o.catatan || '';
+  var grpNama = o.grpNama || 'Muda-Mudi';
+  var periodeLabel = o.periodeLabel || '';
+  var printedAt = o.printedAt || '';
+  var tglAkhirLbl = o.tglAkhirLbl || '';
+  var nMasuk = 0, nKeluar = 0, maxItem = null;
+  periodItems.forEach(function(it){
+    if(it.trx.jenis === 'pemasukan'){ nMasuk++; } else { nKeluar++; }
+    if(!maxItem || it.trx.nominal > maxItem.trx.nominal) maxItem = it;
+  });
+  var isSurplus = selisih >= 0;
+  var donutTotal = totalMasuk + totalKeluar;
+  var pctMasuk = donutTotal > 0 ? Math.round(totalMasuk / donutTotal * 100) : 0;
+  // Donat: track + busur keluar (offset 0) + busur masuk (offset -lenKeluar).
+  var dR = 54, dC = 70, dCirc = 2 * Math.PI * dR;
+  var lenK = donutTotal > 0 ? totalKeluar / donutTotal * dCirc : 0;
+  var lenM = donutTotal > 0 ? totalMasuk / donutTotal * dCirc : 0;
+  var donutSvg = '<svg width="132" height="132" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="' + dC + '" cy="' + dC + '" r="' + dR + '" fill="none" stroke="#e8e6df" stroke-width="14"/>';
+  if(donutTotal > 0){
+    if(totalKeluar > 0) donutSvg += '<circle cx="' + dC + '" cy="' + dC + '" r="' + dR + '" fill="none" stroke="#ba1a1a" stroke-width="14" stroke-dasharray="' + lenK + ' ' + dCirc + '" stroke-dashoffset="0" transform="rotate(-90 ' + dC + ' ' + dC + ')" stroke-linecap="round"/>';
+    if(totalMasuk > 0) donutSvg += '<circle cx="' + dC + '" cy="' + dC + '" r="' + dR + '" fill="none" stroke="#2d6a4f" stroke-width="14" stroke-dasharray="' + lenM + ' ' + dCirc + '" stroke-dashoffset="' + (-lenK) + '" transform="rotate(-90 ' + dC + ' ' + dC + ')" stroke-linecap="round"/>';
+    donutSvg += '<text x="' + dC + '" y="' + (dC - 1) + '" text-anchor="middle" font-size="16" font-weight="800" fill="#1f2937">' + pctMasuk + '%</text>' +
+      '<text x="' + dC + '" y="' + (dC + 15) + '" text-anchor="middle" font-size="9" font-weight="600" fill="#717973">MASUK</text>';
+  } else {
+    donutSvg += '<text x="' + dC + '" y="' + (dC + 4) + '" text-anchor="middle" font-size="11" fill="#717973">Kosong</text>';
+  }
+  donutSvg += '</svg>';
+  function kpi(title, val, sub, bg, bd, tColor, vColor){
+    return '<div style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:10px;padding:9px 11px;min-width:0">' +
+      '<div style="font-size:8.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:' + tColor + '">' + title + '</div>' +
+      '<div style="margin-top:3px;font-size:14px;font-weight:800;color:' + vColor + ';font-family:\'IBM Plex Mono\',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + val + '</div>' +
+      '<div style="font-size:9px;color:' + tColor + ';margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + sub + '</div></div>';
+  }
+  var kpiHtml = '<div style="display:grid;grid-template-columns:1.1fr 1.2fr 1.2fr 1.2fr 1.3fr;gap:8px;margin:12px 0;break-inside:avoid;page-break-inside:avoid">' +
+    kpi('Saldo Awal', fmtRp(saldoAwal), 'Bawaan periode sebelumnya', '#fbf9f6', '#e8e6df', '#717973', '#1f2937') +
+    kpi('Total Pemasukan', '+' + fmtRp(totalMasuk), nMasuk + ' transaksi pemasukan', '#ebf5f0', '#c1ecd4', '#2d6a4f', '#2d6a4f') +
+    kpi('Total Pengeluaran', '−' + fmtRp(totalKeluar), nKeluar + ' transaksi pengeluaran', '#fff1f2', '#ffdad6', '#ba1a1a', '#ba1a1a') +
+    kpi('Arus Kas Bersih', (isSurplus ? '+' : '−') + fmtRp(Math.abs(selisih)), isSurplus ? 'Surplus periode ini' : 'Defisit periode ini', '#fef3c7', '#ffdcbd', '#b45309', isSurplus ? '#2d6a4f' : '#ba1a1a') +
+    '<div style="background:#1b4332;border:1px solid #1b4332;border-radius:10px;padding:9px 11px;min-width:0">' +
+      '<div style="font-size:8.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#a7d7c5">Saldo Akhir</div>' +
+      '<div style="margin-top:3px;font-size:15px;font-weight:800;color:#ffffff;font-family:\'IBM Plex Mono\',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + fmtRp(saldoAkhir) + '</div>' +
+      '<div style="font-size:9px;color:#a7d7c5;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Posisi per ' + escHtml(tglAkhirLbl) + '</div></div>' +
   '</div>';
+  var legendHtml = '<div style="font-size:10.5px">' +
+    (totalMasuk > 0 ? '<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><span style="width:10px;height:10px;border-radius:50%;background:#2d6a4f;flex-shrink:0"></span><span style="color:#4b5563;flex:1">Pemasukan</span><span style="font-weight:700;font-family:\'IBM Plex Mono\',monospace">' + fmtRp(totalMasuk) + '</span></div>' : '') +
+    (totalKeluar > 0 ? '<div style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#ba1a1a;flex-shrink:0"></span><span style="color:#4b5563;flex:1">Pengeluaran</span><span style="font-weight:700;font-family:\'IBM Plex Mono\',monospace">' + fmtRp(totalKeluar) + '</span></div>' : '') +
+    ((totalMasuk <= 0 && totalKeluar <= 0) ? '<div style="color:#717973">Belum ada transaksi.</div>' : '') +
+  '</div>';
+  var noteInner = '';
+  if(catatan){
+    noteInner = escHtml(catatan).replace(/\r\n/g, '\n').replace(/\n/g, '<br>');
+  } else if(maxItem){
+    noteInner = 'Transaksi terbesar: <b>' + escHtml(maxItem.trx.keterangan || 'Tanpa keterangan') + '</b> — ' +
+      fmtRp(maxItem.trx.nominal) + ' (' + (maxItem.trx.jenis === 'pemasukan' ? 'pemasukan' : 'pengeluaran') + '). ' +
+      'Total ' + periodItems.length + ' catatan (' + nMasuk + ' masuk, ' + nKeluar + ' keluar).';
+  }
+  // Kolom kiri ala Stitch: kartu komposisi (donat + legenda + sorotan saldo)
+  // + kartu catatan. Kolom kanan: judul + tabel penuh.
+  var asideHtml = '<div style="min-width:0">' +
+    '<div style="border:1px solid #e8e6df;border-radius:12px;background:#fbf9f6;padding:12px 14px;break-inside:avoid;page-break-inside:avoid">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #e8e6df">' +
+        '<span style="font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563">Komposisi Kas</span>' +
+        '<span style="font-size:9px;font-weight:700;color:#4b5563;background:#e8e6df;border-radius:99px;padding:2px 9px">Rasio</span></div>' +
+      '<div style="display:flex;justify-content:center;padding:4px 0 8px">' + donutSvg + '</div>' +
+      '<div style="border-top:1px solid #e8e6df;padding-top:8px">' + legendHtml + '</div>' +
+      '<div style="margin-top:8px;background:#ebf5f0;border:1px solid #c1ecd4;border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+        '<div style="min-width:0"><div style="font-size:8.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#2d6a4f">Saldo Akhir</div>' +
+        '<div style="font-size:13px;font-weight:800;color:#1b4332;font-family:\'IBM Plex Mono\',monospace;font-variant-numeric:tabular-nums">' + fmtRp(saldoAkhir) + '</div></div>' +
+        '<span style="width:24px;height:24px;border-radius:50%;background:#c1ecd4;color:#1b4332;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">✓</span></div>' +
+    '</div>' +
+    (noteInner ? '<div style="margin-top:10px;border:1px solid #e8e6df;border-radius:12px;background:#ffffff;padding:12px 14px;break-inside:avoid;page-break-inside:avoid">' +
+      '<div style="font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1f2937;margin-bottom:6px">Catatan Arus Dana</div>' +
+      '<div style="font-size:10.5px;line-height:1.7;color:#4b5563;overflow-wrap:break-word;word-break:break-word">' + noteInner + '</div></div>' : '') +
+  '</div>';
+  var rowsHtml = '<tr style="background:#ebf5f0"><td style="text-align:center;color:#717973">−</td><td style="color:#717973">−</td>' +
+    '<td style="font-weight:600">Saldo Awal Periode</td>' +
+    '<td style="text-align:right;color:#717973">−</td><td style="text-align:right;color:#717973">−</td>' +
+    '<td style="text-align:right;font-weight:700;color:#b45309">' + fmtRp(saldoAwal) + '</td></tr>';
+  periodItems.forEach(function(item, i){
+    var trx = item.trx;
+    var zebra = (i % 2 === 1) ? 'background:#fbf9f6' : '';
+    rowsHtml += '<tr style="' + zebra + '"><td style="text-align:center;color:#717973">' + (i + 1) + '</td>' +
+      '<td style="white-space:nowrap">' + fmtTglShort(trx.tanggal) + '</td>' +
+      '<td style="font-weight:500">' + escHtml(trx.keterangan || '') + '</td>' +
+      '<td style="text-align:right;color:' + (trx.jenis === 'pemasukan' ? '#2d6a4f;font-weight:600' : '#d1d5db') + '">' + (trx.jenis === 'pemasukan' ? '+' + fmtRp(trx.nominal) : '−') + '</td>' +
+      '<td style="text-align:right;color:' + (trx.jenis === 'pengeluaran' ? '#ba1a1a;font-weight:600' : '#d1d5db') + '">' + (trx.jenis === 'pengeluaran' ? '−' + fmtRp(trx.nominal) : '−') + '</td>' +
+      '<td style="text-align:right;font-weight:700">' + fmtRp(item.saldo) + '</td></tr>';
+  });
+  // Grid 2 kolom ala Stitch: kiri donat+catatan (±28%), kanan tabel (±72%).
+  // Catatan: halaman lanjutan (>1 halaman) tabel tetap di kolom kanan —
+  // area kiri yang kosong di halaman lanjutan adalah konsekuensi layout ini.
+  var tableHtml = '<div style="display:flex;align-items:center;gap:8px;margin:2px 0 8px;break-after:avoid;page-break-after:avoid">' +
+      '<span style="width:4px;height:16px;background:#1b4332;border-radius:2px;flex-shrink:0"></span>' +
+      '<span style="font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase">Buku Kas &amp; Detail Transaksi</span>' +
+      '<span style="margin-left:auto;font-size:10px;color:#717973">Total ' + periodItems.length + ' catatan pembukuan</span></div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:10.5px">' +
+    '<thead><tr>' +
+      '<th style="width:34px">No</th><th style="width:78px">Tanggal</th><th>Keterangan Transaksi</th>' +
+      '<th style="text-align:right;width:110px">Masuk (Rp)</th><th style="text-align:right;width:110px">Keluar (Rp)</th><th style="text-align:right;width:120px">Saldo (Rp)</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rowsHtml + '</tbody>' +
+    '<tfoot><tr>' +
+      '<td colspan="3" style="font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Total Periode</td>' +
+      '<td style="text-align:right;font-weight:800;color:#2d6a4f">+' + fmtRp(totalMasuk) + '</td>' +
+      '<td style="text-align:right;font-weight:800;color:#ba1a1a">−' + fmtRp(totalKeluar) + '</td>' +
+      '<td style="text-align:right;font-weight:800;background:#ebf5f0">' + fmtRp(saldoAkhir) + '</td>' +
+    '</tr></tfoot></table>';
+  // Grid 2 kolom ala Stitch: kiri donat+catatan (±292px), kanan tabel.
+  // Halaman lanjutan: tabel tetap di kolom kanan (area kiri kosong di
+  // halaman lanjutan — konsekuensi layout Stitch ini).
+  var body2col = '<div style="display:grid;grid-template-columns:292px minmax(0,1fr);gap:12px;align-items:start">' +
+    asideHtml +
+    '<div style="min-width:0">' + tableHtml + '</div>' +
+  '</div>';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<title>Laporan Keuangan ' + escHtml(grpNama) + ' Margosari — ' + escHtml(periodeLabel) + '</title>' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">' +
+    '<style>@page{size:A4 landscape;margin:8mm}' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;color:#1f2937;background:#ffffff;padding:7mm 9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+    '.kophd{display:flex;justify-content:space-between;gap:16px;padding-bottom:10px;margin-bottom:4px;border-bottom:3px solid #1b4332;break-inside:avoid;page-break-inside:avoid}' +
+    '.kop-l{display:flex;gap:12px;align-items:flex-start;min-width:0}' +
+    '.kop-ic{width:52px;height:52px;border-radius:14px;background:#ebf5f0;border:1px solid #c1ecd4;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
+    '.kop-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1b4332;background:#ebf5f0;border:1px solid #c1ecd4;border-radius:99px;padding:2px 10px}' +
+    '.kop-h1{font-family:"Zilla Slab",Georgia,serif;font-weight:700;font-size:24px;color:#1f2937;margin-top:2px}' +
+    '.kop-sub{font-size:11px;color:#717973;margin-top:1px}' +
+    '.kop-r{text-align:right;flex-shrink:0}' +
+    '.kop-pl{font-size:9px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#717973}' +
+    '.kop-per{font-size:14px;font-weight:700;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;margin-top:2px}' +
+    '.kop-tag{display:inline-block;font-size:9.5px;font-weight:700;color:#ffffff;background:#1b4332;border-radius:99px;padding:2px 11px;margin-top:5px}' +
+    'table thead{display:table-header-group}' +
+    'table thead th{background:#1b4332;color:#ffffff;font-size:8.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:7px 9px;text-align:left;border:1px solid #1b4332}' +
+    'table thead th:last-child{border-right:1px solid #1b4332}' +
+    'table tbody td{padding:6px 9px;border:1px solid #e8e6df;vertical-align:top;font-size:10.5px;overflow-wrap:break-word;word-break:break-word}' +
+    'table tbody td.num,table td.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}' +
+    'table tbody tr{break-inside:avoid;page-break-inside:avoid}' +
+    'table tfoot{display:table-row-group}' +
+    'table tfoot td{padding:8px 9px;border:1px solid #e8e6df;border-top:2px solid #1b4332;background:#fbf9f6;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:10.5px}' +
+    '.sig{margin-top:14px;padding-top:10px;border-top:1px solid #e8e6df;display:flex;gap:16px;align-items:flex-end;break-inside:avoid;page-break-inside:avoid;break-before:avoid;page-break-before:avoid}' +
+    '.sig-meta{flex:1;min-width:0;font-size:9.5px;color:#717973;line-height:1.7}' +
+    '.sig-cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;width:360px;flex-shrink:0;text-align:center}' +
+    '.sig-role{font-size:10.5px;color:#4b5563}' +
+    '.sig-space{height:56px}' +
+    '.sig-name{border-top:1px solid #717973;padding-top:5px;font-size:10.5px;font-weight:700;text-transform:uppercase}' +
+    '.sig-sub{font-size:9px;color:#717973;margin-top:1px}' +
+    '@media print{body{background:#ffffff}}' +
+    '</style></head><body>' +
+    '<div class="kophd"><div class="kop-l"><div class="kop-ic">' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>' +
+      '<div><span class="kop-badge">Laporan Rekapitulasi Keuangan</span>' +
+      '<div class="kop-h1">' + escHtml(grpNama) + ' Margosari</div>' +
+      '<div class="kop-sub">Laporan Arus Kas Periode Berjalan</div></div></div>' +
+    '<div class="kop-r"><div class="kop-pl">Periode Aktif Pembukuan</div>' +
+      '<div class="kop-per">' + escHtml(periodeLabel) + '</div>' +
+      '<span class="kop-tag">Kas &amp; Keuangan</span></div></div>' +
+    kpiHtml + body2col +
+    '<div class="sig"><div class="sig-meta">Dicetak: ' + escHtml(printedAt) + '<br>Sistem Rekap Absensi ' + escHtml(grpNama) + ' Margosari</div>' +
+    '<div class="sig-cols"><div><div class="sig-role">Bendahara Keuangan,</div><div class="sig-space"></div>' +
+      '<div class="sig-name">Bendahara ' + escHtml(grpNama) + '</div><div class="sig-sub">Pengelola Kas Margosari</div></div>' +
+    '<div><div class="sig-role">Mengetahui &amp; Menyetujui,</div><div class="sig-space"></div>' +
+      '<div class="sig-name">Ketua / Penanggung Jawab</div><div class="sig-sub">' + escHtml(grpNama) + ' Margosari</div></div></div></div>' +
+    '</body></html>';
 }
 
 // ── Export ──
@@ -526,60 +704,48 @@ function kasExport(type){
   var periodeLabel=(cDari||'Awal')+' s/d '+(cSampai||'Akhir');
 
   if(type==='print'){
-    var kasSection=kasPrintSectionHtml(periodItems,saldoAwal,totalMasuk,totalKeluar,selisih,saldoAkhir);
     var printedAt=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
-var grpNama = (currentGroupInfo && currentGroupInfo.displayName) || 'Muda-Mudi';
-var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-      '<title>Laporan Keuangan '+grpNama+' Margosari — '+periodeLabel+'</title>'+
-      '<link rel="preconnect" href="https://fonts.googleapis.com">'+
-      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
-      '<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">'+
-      '<style>*{box-sizing:border-box;margin:0;padding:0}'+
-      'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;color:#1f2937;background:#fbf9f6;padding:24px 28px;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
-      '.print-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:18px;border-bottom:2px solid #1b4332}'+
-      '.ph-left{display:flex;align-items:center;gap:14px}.ph-icon{width:46px;height:46px;background:#ebf5f0;border:1.5px solid #1b4332;border-radius:12px;display:flex;align-items:center;justify-content:center}'+
-      '.ph-sub{font-size:9.5px;color:#1b4332;letter-spacing:.6px;font-weight:700;text-transform:uppercase;margin-bottom:3px}.ph-title{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:19px;color:#1f2937}'+
-      '.ph-right{text-align:right}.ph-period-lbl{font-size:9px;color:#717973;letter-spacing:.3px;text-transform:uppercase;margin-bottom:3px}.ph-period-val{font-size:15px;font-weight:700;color:#1f2937}'+
-      '.ph-badge{display:inline-block;margin-top:4px;background:#ebf5f0;border:1px solid #1b4332;color:#1b4332;font-size:9px;font-weight:700;padding:2px 10px;border-radius:20px;letter-spacing:.3px}'+
-      '.cf-donut-row{display:flex;gap:12px;margin-bottom:16px;align-items:stretch}.cf-box,.donut-box{background:#ffffff;box-shadow:0 1px 3px rgba(28,25,23,.07)}'+
-      '.cf-box{flex:1;border:1px solid #e8e6df;border-radius:12px;overflow:hidden}'+
-      '.cf-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;padding:10px 12px;border-bottom:1px solid #e8e6df;background:#fbf9f6}'+
-      '.cf-row{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid #e8e6df;gap:10px;font-size:10.5px}.cf-row:last-child{border-bottom:none}'+
-      '.cf-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.cf-lbl{flex:1;color:#4b5563}.cf-val{font-weight:600}'+
-      '.cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#ebf5f0;border-top:2px solid #1b4332}.cf-sa-lbl{font-size:11px;font-weight:700;color:#1b4332}.cf-sa-val{font-size:15px;font-weight:700;color:#1b4332}'+
-      '.donut-box{width:184px;flex-shrink:0;border:1px solid #e8e6df;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px}'+
-      '.donut-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;align-self:flex-start;margin-bottom:4px}.donut-legend{width:100%;font-size:10px}'+
-      '.donut-leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}.donut-leg-lbl{flex:1;color:#4b5563}.donut-leg-val{font-weight:700;font-size:10px}'+
-      '.section-title{font-size:10px;font-weight:700;color:#1f2937;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.section-title::after{content:"";flex:1;height:1px;background:#e8e6df}'+
-      'table{width:100%;border-collapse:collapse;border:1px solid #e8e6df;border-radius:12px;overflow:hidden}thead tr{background:#fbf9f6}th{padding:7px 9px;font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.3px;text-align:left;text-transform:uppercase;border-bottom:2px solid #1b4332}'+
-      'td{padding:6px 9px;border-bottom:1px solid #e8e6df;vertical-align:top}.num{text-align:right}.bold{font-weight:700}.green{color:#2d6a4f}.red{color:#ba1a1a}'+
-      '.saldo-awal-row td{background:#ebf5f0}.total-row td{background:#ebf5f0;font-weight:700;border-top:2px solid #1b4332}'+
-      '.footer{margin-top:16px;padding-top:10px;border-top:2px solid #1b4332;display:flex;justify-content:space-between;align-items:flex-end}.footer-left{font-size:9px;color:#717973}'+
-      '.sign-box{text-align:center;font-size:9.5px}.sign-line{width:130px;border-top:1px solid #717973;margin:28px auto 4px}'+
-      '@media print{body{background:#ffffff;padding:12px 16px}.no-print{display:none!important}.cf-box,.donut-box{box-shadow:none}}'+
-      '</style></head><body>'+
-      '<div class="print-header"><div class="ph-left"><div class="ph-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>'+
-      '<div><div class="ph-sub">Laporan Keuangan</div><div class="ph-title">'+grpNama+' Margosari</div></div></div>'+
-      '<div class="ph-right"><div class="ph-period-lbl">Periode Aktif</div><div class="ph-period-val">'+periodeLabel+'</div><div class="ph-badge">Kas &amp; Keuangan</div></div></div>'+
-      kasSection+
-      '<div class="footer"><div class="footer-left">Dicetak: '+printedAt+'<br>Sistem Rekap Absensi '+grpNama+' Margosari</div>'+
-      '<div class="sign-box"><div class="sign-line"></div>Bendahara / Penanggung Jawab</div></div>'+
-      '</body></html>';
-    _printWithIframe(html);
+    var grpNama=(currentGroupInfo && currentGroupInfo.displayName) || 'Muda-Mudi';
+    var _today=new Date();
+    var _todayIso=_today.getFullYear()+'-'+String(_today.getMonth()+1).padStart(2,'0')+'-'+String(_today.getDate()).padStart(2,'0');
+    _printWithIframe(kasBuildLaporanHtml({
+      periodItems: periodItems, saldoAwal: saldoAwal, totalMasuk: totalMasuk,
+      totalKeluar: totalKeluar, selisih: selisih, saldoAkhir: saldoAkhir,
+      catatan: '', grpNama: grpNama, periodeLabel: periodeLabel,
+      printedAt: printedAt, tglAkhirLbl: cSampai ? fmtTglShort(cSampai) : fmtTglShort(_todayIso)
+    }));
   } else if(type==='excel'){
     var wb=XLSX.utils.book_new();
-    var wsData=[['Tanggal','Keterangan','Masuk','Keluar','Saldo']];
+    var printedAtXls=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
+    var grpNamaXls=(currentGroupInfo && currentGroupInfo.displayName) || 'Muda-Mudi';
+    // SheetJS Community Edition tidak mendukung styling sel (tebal/warna/
+    // number-format/wrap): yang didukung hanya nilai, !cols, !autofilter,
+    // !freeze. Angka dibiarkan numerik agar bisa dijumlah di Excel/Sheets.
+    var wsData=[
+      ['Laporan Keuangan '+grpNamaXls+' Margosari'],
+      ['Periode: '+periodeLabel],
+      ['Dicetak: '+printedAtXls],
+      [],
+      ['Tanggal','Keterangan','Masuk','Keluar','Saldo']
+    ];
     wsData.push(['Saldo Awal','','','',saldoAwal]);
     periodItems.forEach(function(item){
       var trx=item.trx;
       wsData.push([fmtTglShort(trx.tanggal),trx.keterangan||'',trx.jenis==='pemasukan'?trx.nominal:'',trx.jenis==='pengeluaran'?trx.nominal:'',item.saldo]);
     });
     wsData.push(['TOTAL','',totalMasuk,totalKeluar,saldoAkhir]);
+    wsData.push([]);
+    wsData.push(['RINGKASAN']);
+    wsData.push(['Saldo Awal',saldoAwal]);
+    wsData.push(['Total Pemasukan',totalMasuk]);
+    wsData.push(['Total Pengeluaran',totalKeluar]);
+    wsData.push(['Selisih',selisih]);
+    wsData.push(['Saldo Akhir',saldoAkhir]);
     var ws=XLSX.utils.aoa_to_sheet(wsData);
     try{
-      ws['!cols']=[{wch:14},{wch:34},{wch:14},{wch:14},{wch:14}];
-      ws['!autofilter']={s:{r:0,c:0},e:{r:0,c:4}};
-      ws['!freeze']='A2';
+      ws['!cols']=[{wch:14},{wch:40},{wch:16},{wch:16},{wch:16}];
+      ws['!autofilter']={s:{r:4,c:0},e:{r:4,c:4}};
+      ws['!freeze']='A6';
     }catch(e){}
     XLSX.utils.book_append_sheet(wb,ws,'Kas '+periodeLabel);
     XLSX.writeFile(wb,'Laporan_Kas_'+periodeLabel.replace(/\s+/g,'_')+'.xlsx');
@@ -588,7 +754,7 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     lines.push('"Saldo Awal","","","",'+saldoAwal);
     periodItems.forEach(function(item){
       var trx=item.trx;
-      lines.push('"'+fmtTglShort(trx.tanggal)+'","'+(trx.keterangan||'')+'","'+(trx.jenis==='pemasukan'?trx.nominal:'')+'","'+(trx.jenis==='pengeluaran'?trx.nominal:'')+'",'+item.saldo);
+      lines.push('"'+fmtTglShort(trx.tanggal)+'","'+csvEsc(trx.keterangan||'')+'","'+(trx.jenis==='pemasukan'?trx.nominal:'')+'","'+(trx.jenis==='pengeluaran'?trx.nominal:'')+'",'+item.saldo);
     });
     lines.push('"TOTAL","",'+totalMasuk+','+totalKeluar+','+saldoAkhir);
     var a=document.createElement('a');
@@ -596,4 +762,10 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     a.download='Laporan_Kas_'+periodeLabel.replace(/\s+/g,'_')+'.csv';
     a.click();
   }
+}
+
+// Escape CSV: gandakan kutip (") di dalam field ber-kutip. BOM UTF-8
+// tetap dipakai saat unduh agar Excel Windows membaca non-ASCII benar.
+function csvEsc(s){
+  return String(s == null ? '' : s).replace(/"/g, '""');
 }

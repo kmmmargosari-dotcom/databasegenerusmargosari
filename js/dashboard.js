@@ -2,14 +2,8 @@
 // DASHBOARD
 // ══════════════════════════════════════════════════
 
-// Rentang grafik dashboard: '1' = Bulan Ini, '3' = 3 Bulan terakhir, '12' = Tahun Ini.
-// KPI "Ringkasan Bulan Ini" tetap bulanan — yang berubah hanya grafik + legend + subtitlenya.
+// Grafik dashboard dikunci rentang Bulan Ini.
 var dashRange = '1';
-
-function setDashRange(r){
-  dashRange = (r === '3' || r === '12') ? r : '1';
-  try { renderDashboard(); } catch(e){}
-}
 
 function dashRangePrefixes(){
   var now = new Date();
@@ -101,12 +95,6 @@ function renderDashboard(){
     var el = document.getElementById(id);
     if(el) el.innerHTML = chartSvg;
   });
-  // Sinkron status pil Bulan Ini / 3 Bulan / Tahun Ini (PC + mobile).
-  try {
-    document.querySelectorAll('[data-dashrange]').forEach(function(b){
-      if(b.classList) b.classList.toggle('on', b.getAttribute('data-dashrange') === dashRange);
-    });
-  } catch(e){}
 
   var recentKeys = monthKeys.slice().reverse().slice(0,3);
   var MBLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];

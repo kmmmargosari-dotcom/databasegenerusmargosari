@@ -102,9 +102,15 @@ function resolveUserProfileAndEnter(uid, username){
       var initialGroup = (lastGroup && GROUPS_LIST.some(function(g){ return g.id===lastGroup; }))
         ? lastGroup : GROUPS_LIST[0].id;
       return enterAppWithGroup(initialGroup);
-    } else {
+    } else if(dat.role === 'group' && GROUPS_LIST.some(function(g){ return g.id===dat.groupId; })){
       currentUser = { username: username, nama: accountDisplayName(username, dat.groupId), role: 'group', groupId: dat.groupId };
       return enterAppWithGroup(dat.groupId);
+    } else {
+      // Role/groupId tidak dikenal (mis. salah ketik di dokumen users):
+      // tolak masuk seperti dokumen belum dikonfigurasi, supaya tidak
+      // masuk ke aplikasi dengan kelompok tak valid + error permission.
+      window._fbSignOut(window._auth);
+      return Promise.reject(new Error('AKUN_BELUM_DIKONFIGURASI'));
     }
   });
 }
@@ -206,12 +212,16 @@ function applyRole(){
   // Semua pengguna (admin & kelompok) mendapat akses penuh ke fitur di kelompoknya
   document.querySelectorAll('.need-absen').forEach(function(el){ el.style.display = ''; });
   document.querySelectorAll('.need-admin').forEach(function(el){ el.style.display = ''; });
-  window._canDelete = true;
 
   var roleEls   = document.querySelectorAll('.js-urole');
   var switcher  = document.getElementById('pc-group-switcher');
   var switcherM = document.getElementById('mob-group-switcher');
+  // Kartu Ekspor Semua Kelompok hanya untuk Admin Pusat.
+  var exAllPc = document.getElementById('exAllCardPc');
+  var exAllMob = document.getElementById('exAllCardMob');
   if(currentUser && currentUser.role === 'admin'){
+    if(exAllPc) exAllPc.style.display = '';
+    if(exAllMob) exAllMob.style.display = '';
     roleEls.forEach(function(el){ el.textContent = 'Admin Pusat'; });
     var _opts = GROUPS_LIST.map(function(g){
       return '<option value="'+g.id+'"'+(g.id===currentGroup?' selected':'')+'>'+g.label+'</option>';
@@ -233,5 +243,8 @@ function applyRole(){
     if(switcherM) switcherM.style.display = 'none';
     var wrapM2 = document.getElementById('mob-group-switch-wrap');
     if(wrapM2) wrapM2.style.display = 'none';
+    if(exAllPc) exAllPc.style.display = 'none';
+    if(exAllMob) exAllMob.style.display = 'none';
+    try { if(typeof closeExAll === 'function') closeExAll(); } catch(e){}
   }
 }

@@ -788,6 +788,96 @@ function gabunganPrint(d){
 }
 
 function printRekapDoc(d, o){
+  var grpLabel = ((typeof currentGroupInfo !== 'undefined' && currentGroupInfo && currentGroupInfo.displayName) || 'Muda-Mudi');
+  var periodLabel=(d.customDari||'Awal')+' s/d '+(d.customSampai||'Akhir');
+  _printWithIframe(
+    rekapDocHeadHtml('Rekap '+periodLabel)+
+    buildRekapGroupSectionHtml(d, o, grpLabel)+
+    '</body></html>'
+  );
+}
+
+// ── CSS CETAK REKAP (dipakai bersama print 1 kelompok & semua kelompok) ──
+// Aturan lama tidak diubah; tambahan hanya kelas section grup (.grp-newpage),
+// pengulangan thead tiap halaman, dan larangan potong baris tabel.
+var REKAP_PRINT_CSS =
+  '*{box-sizing:border-box}'+
+  ':root{--green:#2d6a4f;--amber:#b45309;--red:#ba1a1a;--text:#1f2937;--text2:#4b5563;--text3:#717973;--gold:#1b4332;--gold-dk:#1b4332;--gold-lt:#ebf5f0;--gold-xlt:#ebf5f0;--border:#e8e6df}'+
+  'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:10.5px;padding:20px;color:#1f2937;background:#fbf9f6;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+  'h2{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:16px;color:#1f2937;margin:0}'+
+  '.subtitle{color:#717973;font-size:10.5px;margin:2px 0 0}'+
+  '.print-hd{border-bottom:2px solid #1b4332;padding-bottom:8px;margin-bottom:8px}'+
+  'h3{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:13px;color:#1f2937;margin:12px 0 5px;break-after:avoid;page-break-after:avoid}'+
+  '.tbl-card{background:#ffffff;border:1px solid #e8e6df;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(28,25,23,.07);margin:0 0 8px;page-break-inside:auto}'+
+  '.chart-card{padding:8px 14px 2px;page-break-inside:avoid}'+
+  '.chart-card-hd{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#4b5563;margin-bottom:8px}'+
+  '.chart-card svg{display:block;max-width:100%;height:auto}'+
+  '.rc-legend-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:8px 0 10px}'+
+  '.rc-axis{font-size:9.5px;color:#717973;font-weight:500}'+
+  '.rc-legend{display:flex;align-items:center;gap:4px;font-size:9.5px;color:#4b5563;flex-wrap:wrap;margin-left:auto}'+
+  '.rc-legend .rc-dot{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0;margin-left:8px}'+
+  '.rc-legend .rc-dot:first-child{margin-left:0}'+
+  '.num{text-align:right}.bold{font-weight:700}.green{color:#2d6a4f}.red{color:#ba1a1a}'+
+  '.saldo-awal-row td{background:#ebf5f0}.total-row td{background:#ebf5f0;font-weight:700;border-top:2px solid #1b4332}'+
+  '.cf-donut-row{display:flex;gap:12px;margin-bottom:10px;align-items:stretch}.cf-box,.donut-box{background:#ffffff;box-shadow:0 1px 3px rgba(28,25,23,.07)}'+
+  '.cf-box{flex:1;border:1px solid #e8e6df;border-radius:12px;overflow:hidden}'+
+  '.cf-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;padding:10px 12px;border-bottom:1px solid #e8e6df;background:#fbf9f6}'+
+  '.cf-row{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid #e8e6df;gap:10px;font-size:10.5px}.cf-row:last-child{border-bottom:none}'+
+  '.cf-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.cf-lbl{flex:1;color:#4b5563}.cf-val{font-weight:600}'+
+  '.cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#ebf5f0;border-top:2px solid #1b4332}.cf-sa-lbl{font-size:11px;font-weight:700;color:#1b4332}.cf-sa-val{font-size:15px;font-weight:700;color:#1b4332}'+
+  '.donut-box{width:184px;flex-shrink:0;border:1px solid #e8e6df;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px}'+
+  '.donut-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;align-self:flex-start;margin-bottom:4px}.donut-legend{width:100%;font-size:10px}'+
+  '.donut-leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}.donut-leg-lbl{flex:1;color:#4b5563}.donut-leg-val{font-weight:700;font-size:10px}'+
+  '.section-title{font-size:10px;font-weight:700;color:#1f2937;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.section-title::after{content:"";flex:1;height:1px;background:#e8e6df}'+
+  '.kas-print-page{page-break-before:always;break-before:page}'+
+  '.kas-print-page.no-break{page-break-before:auto;break-before:auto}'+
+  // Blok kas model baru (kasPrintSectionHtml): ringkasan + donat tunggal +
+  // tabel + catatan. Berlaku di dokumen rekap landscape maupun kas portrait.
+  '.ks-sum{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid}'+
+  '.ks-mini{border-radius:10px;padding:8px 10px;min-width:0;background:#fbf9f6;border:1px solid #e8e6df}'+
+  '.ks-mini-t{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#717973;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+  '.ks-mini-v{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+  '.ks-donut{display:flex;align-items:center;gap:14px;border:1px solid #e8e6df;border-radius:12px;background:#ffffff;padding:10px 14px;margin-bottom:10px;break-inside:avoid;page-break-inside:avoid}'+
+  '.ks-donut-ttl{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;margin-bottom:6px}'+
+  'table.ks-table td.ks-ket{white-space:normal;overflow-wrap:break-word;word-break:break-word;min-width:120px}'+
+  '.ks-note{padding:10px 12px}'+
+  '.kas-detail-row{display:flex;gap:12px;align-items:stretch}'+
+  '.kas-detail-main{flex:1.45;min-width:0}'+
+  '.kas-detail-side{flex:1;min-width:0;display:flex;flex-direction:column}'+
+  '.catatan-card-side{padding:12px 14px;flex:1}'+
+  '.catatan-text{font-size:10.5px;line-height:1.7}'+
+  'table{width:100%;border-collapse:collapse;font-size:8.5px}'+
+  'th,td{border:1px solid #e8e6df;padding:4px 6px;text-align:center;color:#1f2937;overflow-wrap:break-word}'+
+  'th{background:#fbf9f6;color:#4b5563;font-weight:600;font-size:8px;letter-spacing:.2px;text-transform:uppercase}'+
+  'td.tl{text-align:left}'+
+  'tr.gender-sep td{background:#fbf9f6;color:#4b5563;font-weight:700;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase}'+
+  '.badge{display:inline-block;border-radius:99px;padding:1px 6px;font-size:9px;font-weight:700}'+
+  '.bh{background:#ebf5f0;color:#2d6a4f}.bi{background:#fef3c7;color:#b45309}.ba{background:#fee2e2;color:#ba1a1a}'+
+  '.iz-alasan{font-size:7px;color:#b45309;line-height:1.25;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:1px auto 0;font-style:italic}'+
+  '@page{size:A4 landscape;margin:10mm}'+
+  '@media print{body{background:#ffffff}.tbl-card,.chart-card{box-shadow:none}}'+
+  // Tambahan khusus dokumen semua-kelompok (tidak mengubah tampilan 1 kelompok).
+  '.grp-newpage{page-break-before:always;break-before:page}'+
+  '.grp-title{font-family:"Zilla Slab",Georgia,serif;font-weight:700;font-size:15px;color:#1b4332;margin:0 0 6px;break-after:avoid;page-break-after:avoid}'+
+  'thead{display:table-header-group}'+
+  'tr{break-inside:avoid;page-break-inside:avoid}'+
+  '.sum-table td,.sum-table th{font-size:9px}';
+
+// Head dokumen print (doctype + font + CSS bersama). Isi section dirakit
+// pemanggil (1 kelompok via printRekapDoc, N kelompok via ekspor semua).
+function rekapDocHeadHtml(title){
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+  '<title>'+title+'</title>'+
+  '<link rel="preconnect" href="https://fonts.googleapis.com">'+
+  '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
+  '<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">'+
+  '<style>'+REKAP_PRINT_CSS+'</style></head><body>';
+}
+
+// Satu section kelompok: header + ringkasan + grafik + tabel rekap (+ kas).
+// Dipakai print 1 kelompok (label = kelompok aktif) dan dokumen semua kelompok.
+// o.chart === false untuk sembunyikan grafik; o.kas true untuk sertakan kas.
+function buildRekapGroupSectionHtml(d, o, grpLabel){
   // Tabel & izin DIBANGUN dari data periode export (bukan comot innerHTML
   // layar) supaya sinkron dengan tanggal yang dipilih.
   var tableHtml='<div class="tbl-card"><table><thead>'+rekapTheadHtml(d.sL)+'</thead><tbody>'+rekapTbodyHtml(d.sL,d.mAll,d.rg)+'</tbody></table></div>';
@@ -797,13 +887,13 @@ function printRekapDoc(d, o){
   var tH=st.h, tI=st.iz, tA=st.al, tot=st.tot, avg=st.avg;
   var avgClr=avg>=80?'#2d6a4f':avg>=60?'#b45309':'#ba1a1a';
   var perSesi=buildPerSesi(d.sL, d.mAll);
-  var chartHtml=perSesi.length
-    ? '<div class="tbl-card chart-card">'+
+  var chartHtml=(!perSesi.length || (o && o.chart===false))
+    ? ''
+    : '<div class="tbl-card chart-card">'+
         '<div class="chart-card-hd">Grafik Kehadiran per Pertemuan</div>'+
         buildBarSvg(perSesi, d.mAll.length)+
         chartLegendHtml()+
-      '</div>'
-    : '';
+      '</div>';
   // ── Ringkasan print = cermin kotak web (hero + 4 mini) ──
   var _tr=rekapTrendForRange(d.sL, avg);
   var _trend=_tr.trend;
@@ -856,61 +946,10 @@ function printRekapDoc(d, o){
       kasPrintSectionHtml(_kas.items,_kas.saldoAwal,_kas.masuk,_kas.keluar,_kas.selisih,_kas.saldoAkhir,d.catatan||'')+'</div>';
   }
 
-  _printWithIframe(
-    '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<title>Rekap '+periodLabel+'</title>'+
-    '<link rel="preconnect" href="https://fonts.googleapis.com">'+
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'+
-    '<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">'+
-    '<style>'+
-      '*{box-sizing:border-box}'+
-      ':root{--green:#2d6a4f;--amber:#b45309;--red:#ba1a1a;--text:#1f2937;--text2:#4b5563;--text3:#717973;--gold:#1b4332;--gold-dk:#1b4332;--gold-lt:#ebf5f0;--gold-xlt:#ebf5f0;--border:#e8e6df}'+
-      'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:10.5px;padding:20px;color:#1f2937;background:#fbf9f6;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
-      'h2{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:16px;color:#1f2937;margin:0}'+
-      '.subtitle{color:#717973;font-size:10.5px;margin:2px 0 0}'+
-      '.print-hd{border-bottom:2px solid #1b4332;padding-bottom:8px;margin-bottom:8px}'+
-      'h3{font-family:"Zilla Slab",Georgia,serif;font-weight:600;font-size:13px;color:#1f2937;margin:12px 0 5px;break-after:avoid;page-break-after:avoid}'+
-      '.tbl-card{background:#ffffff;border:1px solid #e8e6df;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(28,25,23,.07);margin:0 0 8px;page-break-inside:auto}'+
-      '.chart-card{padding:8px 14px 2px;page-break-inside:avoid}'+
-      '.chart-card-hd{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#4b5563;margin-bottom:8px}'+
-      '.chart-card svg{display:block;max-width:100%;height:auto}'+
-      '.rc-legend-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;padding:8px 0 10px}'+
-      '.rc-axis{font-size:9.5px;color:#717973;font-weight:500}'+
-      '.rc-legend{display:flex;align-items:center;gap:4px;font-size:9.5px;color:#4b5563;flex-wrap:wrap;margin-left:auto}'+
-      '.rc-legend .rc-dot{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0;margin-left:8px}'+
-      '.rc-legend .rc-dot:first-child{margin-left:0}'+
-      '.num{text-align:right}.bold{font-weight:700}.green{color:#2d6a4f}.red{color:#ba1a1a}'+
-      '.saldo-awal-row td{background:#ebf5f0}.total-row td{background:#ebf5f0;font-weight:700;border-top:2px solid #1b4332}'+
-      '.cf-donut-row{display:flex;gap:12px;margin-bottom:10px;align-items:stretch}.cf-box,.donut-box{background:#ffffff;box-shadow:0 1px 3px rgba(28,25,23,.07)}'+
-      '.cf-box{flex:1;border:1px solid #e8e6df;border-radius:12px;overflow:hidden}'+
-      '.cf-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;padding:10px 12px;border-bottom:1px solid #e8e6df;background:#fbf9f6}'+
-      '.cf-row{display:flex;align-items:center;padding:9px 12px;border-bottom:1px solid #e8e6df;gap:10px;font-size:10.5px}.cf-row:last-child{border-bottom:none}'+
-      '.cf-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}.cf-lbl{flex:1;color:#4b5563}.cf-val{font-weight:600}'+
-      '.cf-saldo-akhir{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#ebf5f0;border-top:2px solid #1b4332}.cf-sa-lbl{font-size:11px;font-weight:700;color:#1b4332}.cf-sa-val{font-size:15px;font-weight:700;color:#1b4332}'+
-      '.donut-box{width:184px;flex-shrink:0;border:1px solid #e8e6df;border-radius:12px;display:flex;flex-direction:column;align-items:center;padding:12px;gap:8px}'+
-      '.donut-box-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#4b5563;align-self:flex-start;margin-bottom:4px}.donut-legend{width:100%;font-size:10px}'+
-      '.donut-leg-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}.donut-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}.donut-leg-lbl{flex:1;color:#4b5563}.donut-leg-val{font-weight:700;font-size:10px}'+
-      '.section-title{font-size:10px;font-weight:700;color:#1f2937;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;display:flex;align-items:center;gap:8px}.section-title::after{content:"";flex:1;height:1px;background:#e8e6df}'+
-      '.kas-print-page{page-break-before:always;break-before:page}'+
-      '.kas-print-page.no-break{page-break-before:auto;break-before:auto}'+
-      '.kas-detail-row{display:flex;gap:12px;align-items:stretch}'+
-      '.kas-detail-main{flex:1.45;min-width:0}'+
-      '.kas-detail-side{flex:1;min-width:0;display:flex;flex-direction:column}'+
-      '.catatan-card-side{padding:12px 14px;flex:1}'+
-      '.catatan-text{font-size:10.5px;line-height:1.7}'+
-      'table{width:100%;border-collapse:collapse;font-size:8.5px}'+
-      'th,td{border:1px solid #e8e6df;padding:4px 6px;text-align:center;color:#1f2937;overflow-wrap:break-word}'+
-      'th{background:#fbf9f6;color:#4b5563;font-weight:600;font-size:8px;letter-spacing:.2px;text-transform:uppercase}'+
-      'td.tl{text-align:left}'+
-      'tr.gender-sep td{background:#fbf9f6;color:#4b5563;font-weight:700;text-align:left;font-size:9px;letter-spacing:.5px;text-transform:uppercase}'+
-      '.badge{display:inline-block;border-radius:99px;padding:1px 6px;font-size:9px;font-weight:700}'+
-      '.bh{background:#ebf5f0;color:#2d6a4f}.bi{background:#fef3c7;color:#b45309}.ba{background:#fee2e2;color:#ba1a1a}'+
-      '.iz-alasan{font-size:7px;color:#b45309;line-height:1.25;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:1px auto 0;font-style:italic}'+
-      '@page{size:A4 landscape;margin:10mm}'+
-      '@media print{body{background:#ffffff}.tbl-card,.chart-card{box-shadow:none}}'+
-    '</style></head><body>'+
-    '<div class="print-hd"><h2>Rekap Absensi '+((currentGroupInfo && currentGroupInfo.displayName) || 'Muda-Mudi')+' Margosari</h2><div class="subtitle">'+periodLabel+'</div></div>'+
-    statHtml+insightPrintHtml+chartHtml+'<h3>Tabel Rekap</h3>'+tableHtml+kasPrintHtml+
-    '</body></html>'
-  );
+  var grpTitle = grpLabel ? ('Rekap Absensi '+grpLabel+' Margosari') : 'Rekap Absensi Margosari';
+  var emptyNote = (!d.sL.length && o && o.emptyNote)
+    ? '<div class="tbl-card" style="padding:10px 14px;color:#717973">Belum ada data pada periode ini.</div>'
+    : '';
+  return '<div class="print-hd"><h2>'+grpTitle+'</h2><div class="subtitle">'+periodLabel+'</div></div>'+
+    statHtml+insightPrintHtml+chartHtml+'<h3>Tabel Rekap</h3>'+tableHtml+emptyNote+kasPrintHtml;
 }

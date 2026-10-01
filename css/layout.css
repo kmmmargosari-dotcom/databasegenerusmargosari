@@ -46,13 +46,13 @@
   letter-spacing:.28em;padding-left:.28em;animation:lsTitle 4.5s ease-in-out infinite;
   text-shadow:0 1px 0 rgba(255,255,255,.6)}
 .ls-status{display:flex;align-items:center;gap:8px;margin-top:10px;padding:3px 12px;
-  border-radius:99px;background:rgba(6,78,59,.04);border:1px solid rgba(6,78,59,.07)}
+  border-radius:999px;background:rgba(6,78,59,.04);border:1px solid rgba(6,78,59,.07)}
 .ls-ping{width:6px;height:6px;border-radius:50%;background:#2d6a4f;animation:lsPing 1.6s ease-out infinite}
 #loading-status{font-size:12px;font-weight:600;color:rgba(19,91,62,.9);letter-spacing:.06em;text-transform:uppercase}
 /* Progress */
 .ls-progress{width:100%;max-width:20rem;display:flex;flex-direction:column;align-items:center}
-.ls-track{width:100%;height:7px;background:rgba(6,78,59,.12);border-radius:99px;overflow:hidden;position:relative;padding:1px;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
-.ls-fill{height:100%;border-radius:99px;position:relative;overflow:hidden;
+.ls-track{width:100%;height:7px;background:rgba(6,78,59,.12);border-radius:999px;overflow:hidden;position:relative;padding:1px;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+.ls-fill{height:100%;border-radius:999px;position:relative;overflow:hidden;
   background:linear-gradient(90deg,#1b4332,#2d6a4f,#b45309);transition:width .3s ease-out}
 .ls-fill::after{content:"";position:absolute;top:0;left:0;right:0;bottom:0;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);
@@ -127,8 +127,6 @@
   padding:11px!important;font-size:14px!important;font-weight:600!important;border-radius:12px!important}
 .login-submit:hover{background:#1b4332!important}
 .login-submit span{font-weight:800}
-.login-help{text-align:center;font-size:12px;color:#717973;margin-top:16px;padding-top:14px;border-top:1px solid #f5f3f0}
-.login-help a{color:#1b4332;font-weight:600}
 .login-foot{text-align:center;font-size:11.5px;color:#717973;font-weight:500;line-height:1.6;max-width:440px}
 .login-foot span{color:#9ca3af;font-size:10.5px}
 @media(max-width:480px){.login-lux .login-card{padding:26px 20px}.login-logo img{width:100px;height:100px}}
@@ -137,13 +135,7 @@
 ═════════════════════════════════ */
 .login-center{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg2);padding:24px}
 .login-card{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow-soft)}
-.login-card-hero{text-align:center;padding-bottom:24px;border-bottom:1px solid var(--border);margin-bottom:24px}
-.login-mosq{margin-bottom:12px}
-.login-mosq img{width:76px;height:76px;object-fit:contain}
-.login-card-title{font-size:20px;font-weight:300;color:var(--text);line-height:1.35;letter-spacing:-.4px;margin-bottom:6px}
-.login-card-sub{font-size:12px;color:var(--text3)}
 .login-err{font-size:12px;color:var(--red);text-align:center;min-height:18px;margin-bottom:8px}
-.login-copy-foot{font-size:11px;color:var(--text3);text-align:center;margin-top:20px}
 .remember-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer;user-select:none}
 .remember-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
 .remember-row span{font-size:12px;color:var(--text2)}
@@ -162,7 +154,6 @@
     background:rgba(253,252,250,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
     box-shadow:0 1px 2px rgba(0,0,0,.04);z-index:20}
   .sidebar-hd{padding:20px 24px;border-bottom:1px solid #e8e6df;display:flex;align-items:center;gap:14px}
-  .sidebar-logo{width:40px;height:40px;object-fit:contain;flex-shrink:0;background:#ffffff;border:1px solid #e8e6df;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
   .sidebar-hd-text{flex:1;min-width:0}
   .sidebar-title{font-size:13px;font-weight:700;color:#1f2937;line-height:1.35;letter-spacing:-.2px}
   .sidebar-date{font-size:11px;color:#4b5563;margin-top:2px;font-weight:500}
@@ -269,14 +260,6 @@
 
   /* Login mobile */
   .login-card{padding:28px 20px}
-  .login-card-title{font-size:18px}
-
-  /* Rekap summary panel */
-  .rs-panel{padding:12px 14px;gap:0}
-  .rs-divider{margin:0 10px}
-  .rs-val{font-size:20px}
-  .rs-lbl{font-size:8px}
-  .rs-item{padding:6px 6px}
 
   /* Petunjuk visual bahwa tabel rekap bisa digeser horizontal */
   .rekap-tbl-wrap{position:relative}
@@ -302,7 +285,6 @@
 .shake{animation:shake .4s ease}
 .sp-pop{animation:spPop .35s cubic-bezier(.34,1.55,.64,1) both}
 @keyframes spPop{0%{transform:scale(.82)} 60%{transform:scale(1.13)} 100%{transform:scale(1)}}
-.ip-btn:active{background:var(--bg3)!important}
 
 /* Pindah antar tahap absensi (PC & mobile): konten body fade halus */
 #pc-stage-hero,#pc-stage-main,#mob-stage-hero,#mob-stage-main{animation:listIn .2s ease-out both}
@@ -314,7 +296,7 @@
 @media print{
   body{background:#ffffff}
   .sidebar,.pc-topbar,.mob-pg-hd,.mob-bottom-nav,.toolbar,.sync-badge,.user-info,
-  .izin-overlay,.izin-popup,#app-toast,.no-print{display:none!important}
+  .izin-overlay,.izin-popup,#app-toast{display:none!important}
   .pc-shell{display:block;height:auto;overflow:visible;max-width:none;margin:0;box-shadow:none;background:#ffffff}
   .pc-content{display:block;overflow:visible;padding:0}
   .pane{display:none}
@@ -323,25 +305,21 @@
   .mob-shell{position:static;overflow:visible;display:block;background:#ffffff}
   .mob-page{display:none}
   .mob-page.on{display:block!important;overflow:visible}
-  .rekap-tbl-wrap,.tbl-wrap{overflow:visible}
-  .tbl-card,.stat-card,.rs-panel,.welcome-card{box-shadow:none;background:#ffffff}
+  .rekap-tbl-wrap{overflow:visible}
+  .tbl-card{box-shadow:none;background:#ffffff}
 }
 
 /* ══════════════════════════════════
    KELAS CABERAWIT (PAUD → Tilawati 1-6 → Al-Quran)
    Dipakai di Anggota, Absensi, dan Rekap — rapi & konsisten.
 ══════════════════════════════════ */
-.kelas-pill{display:inline-block;font-size:10px;font-weight:700;color:#1b4332;background:#ebf5f0;border:1px solid #cfe0d4;border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:1px;white-space:nowrap}
-.kelas-pill-tbl{margin-left:4px;font-size:9px;padding:0 7px}
+.kelas-pill{display:inline-block;font-size:10px;font-weight:700;color:#1b4332;background:#ebf5f0;border:1px solid #cfe0d4;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;white-space:nowrap}
 .kelas-sep{display:flex;align-items:center;gap:8px;margin:14px 2px 8px}
 .kelas-sep:first-child{margin-top:2px}
-.kelas-sep-name{font-size:12px;font-weight:700;color:#1b4332;background:#ebf5f0;border:1px solid #cfe0d4;border-radius:99px;padding:3px 12px;white-space:nowrap}
+.kelas-sep-name{font-size:12px;font-weight:700;color:#1b4332;background:#ebf5f0;border:1px solid #cfe0d4;border-radius:999px;padding:3px 12px;white-space:nowrap}
 .kelas-sep-count{font-size:11px;color:var(--text3)}
 .kelas-sep::after{content:"";flex:1;height:1px;background:var(--border)}
 tr.kelas-sep-row td, tr.gender-sep.kelas-sep-row td{background:#ebf5f0!important;color:#1b4332!important;font-weight:700;text-align:left;font-size:10px;letter-spacing:.4px;text-transform:uppercase}
 .ang-cards-kelas{display:flex;flex-direction:column;gap:12px}
-/* Logo di bingkai putih — pastikan logo baru (kotak) tampil penuh */
-.sidebar-logo,.lux-seal img,.kas-seal-ring img{object-fit:contain;background:#ffffff}
-.login-logo img{background:none}
 /* Popup tambah anggota: select kelas selebar input lain */
 #iKelas{width:100%;box-sizing:border-box}

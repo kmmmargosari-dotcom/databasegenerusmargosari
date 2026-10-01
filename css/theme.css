@@ -38,10 +38,10 @@
 body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text)}
 .ico{stroke-width:1.75}
 /* Angka tabular agar kolom/kas/rekap sejajar */
-.kpi-val,.lux-hero-num,.rk-hero-num,.rk-mini-num,.stat-val,.cf-val,
+.kpi-val,.rk-hero-num,.rk-mini-num,
 .kas-cf-row-val,.kas-cf-saldo-akhir-val,.lux-kas-saldo strong,
 .rekap-tbl-x td,.mdet-table td,.kas-riwayat-table td,.lux-bar-lbl,
-.mdet-stat-val,.rs-val{font-variant-numeric:tabular-nums}
+.mdet-stat-val{font-variant-numeric:tabular-nums}
 
 /* ── Tombol ── */
 .btn-p{background:#1b4332;border-color:#012d1d;color:#ffffff;font-weight:600}
@@ -56,7 +56,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 /* ── Chip / badge status (24px pill, label-sm) ── */
 .badge,.kelas-pill,.log-badge,.rk-pill,.rekap-sesi-pill,.abs-ket-pill,
-.ang-count,.lux-sesi-pill,.rk-delta,.rs-trend-badge,.lain-mini{
+.ang-count,.lux-sesi-pill,.rk-delta,.lain-mini{
   display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;
   border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.04em;line-height:1.4}
 .bh{background:rgba(82,183,136,.18);color:#1b4332}
@@ -124,3 +124,57 @@ input[type=checkbox],input[type=radio]{height:18px;width:18px;accent-color:#1b43
 .mob-nav-pill{background:#ffffff;border:1px solid #e8e6df}
 .mob-nav-item{color:#4b5563}
 .mob-nav-item.on{color:#1b4332;font-weight:600}
+
+/* ══════════════════════════════════════════════════════════════
+   UI CONSISTENCY LAYER (audit Tahap 1 → token + unifikasi)
+   Semua override dikumpulkan di sini (file dimuat paling akhir).
+   Hanya visual: tidak ada id/class/JS/logika yang diubah.
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  /* TAHAP 2 — token baru (nama lama tidak diubah) */
+  --space-xs:4px; --space-sm:8px; --space-md:12px; --space-lg:16px; --space-xl:20px; --space-2xl:24px;
+  --radius-sm:6px; --radius-md:8px; --radius-lg:12px; --radius-xl:16px; --radius-pill:999px;
+  --tap-min:44px;
+  --input-fs:13px; --input-fs-mob:16px;
+  --focus-ring:0 0 0 3px rgba(82,183,136,.25);
+  --overlay:rgba(31,41,55,.4);
+  --placeholder:#6b7280;
+  --dur-fast:.12s; --dur-med:.2s; --ease:cubic-bezier(.22,.72,0,1);
+}
+
+/* Kontras placeholder (WCAG AA) */
+input::placeholder,textarea::placeholder{color:var(--placeholder)}
+
+/* TAHAP 3 — tombol: tinggi & radius seragam, warna dipertahankan */
+.tb-btn,.exp-btn,.exp-dark,.exp-act-btn,.exp-sel-btn,
+.abs-hero-btn,.kas-hero-btn,.lux-outline-btn,.mdet-close-btn,.mdet-sort-btn{
+  min-height:40px;border-radius:var(--radius-md);font-weight:600}
+.exp-act-btn{border-radius:var(--radius-md)}
+.exp-sel-btn{border-radius:var(--radius-sm)}
+.abs-hero-btn,.kas-hero-btn{border-radius:var(--radius-lg)}
+
+/* Anomali warna status → token (beda angka, makna sama) */
+.log-sesi{background:#e9e8e5;color:#414844}
+.exp-lux .exp-foot{color:#717973}
+.exp-lux .exp-sep{color:#717973}
+
+/* TAHAP 4 — standar popup: semua dialog max-height + isi scroll + footer aman */
+.izin-popup,.mdet-modal,.status-menu{border-radius:var(--radius-lg)}
+.izin-popup{display:none;flex-direction:column;max-height:88vh;max-height:88dvh}
+.izin-popup.show{display:flex}
+.izin-popup-body{overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
+.izin-popup-footer{flex-shrink:0;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.mdet-modal{max-height:88vh;max-height:88dvh}
+#app-popup{max-height:88vh;max-height:88dvh}
+@media(max-width:640px){
+  .izin-popup,.mdet-modal{width:min(480px,94vw);max-height:92vh;max-height:92dvh}
+  .izin-popup-footer .btn-sec,.izin-popup-footer .exp-act-btn,
+  .mdet-footer button{min-height:var(--tap-min)}
+}
+
+/* TAHAP 6 — target sentuh mobile ≥44px (hanya menaikkan yang kekecilan) */
+@media(max-width:768px){
+  input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:var(--input-fs-mob)}
+  .sp,.mdet-sf-btn,.seg-btn,.izin-tpl{padding-top:10px;padding-bottom:10px}
+  .more-btn,.mdet-close,.mdet-sf-reset{min-width:var(--tap-min);min-height:var(--tap-min)}
+}

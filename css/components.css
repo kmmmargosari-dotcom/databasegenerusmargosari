@@ -6,7 +6,7 @@
 .sk-lines{flex:1;display:flex;flex-direction:column;gap:6px}
 .sk-line{height:10px;border-radius:6px;background:var(--bg3);animation:skShimmer 1.3s infinite}
 .sk-line.short{width:55%}
-.sk-badge{width:56px;height:24px;border-radius:99px;background:var(--bg3);animation:skShimmer 1.3s infinite;flex-shrink:0}
+.sk-badge{width:56px;height:24px;border-radius:999px;background:var(--bg3);animation:skShimmer 1.3s infinite;flex-shrink:0}
 @keyframes skShimmer{0%{opacity:1} 50%{opacity:.45} 100%{opacity:1}}
 
 /* ══════════════════════════════════
@@ -53,7 +53,7 @@
   transform:translateX(-50%);
   display:none;align-items:center;gap:9px;
   background:rgba(31,45,36,.94);color:#ffffff;
-  padding:11px 18px;border-radius:99px;font-size:13px;line-height:1.35;
+  padding:11px 18px;border-radius:999px;font-size:13px;line-height:1.35;
   box-shadow:0 8px 28px rgba(20,32,26,.28);
   z-index:9999;max-width:min(92vw,420px);
   animation:toastIn .22s ease both;
@@ -106,13 +106,13 @@
 .mdet-sort-btn.desc{color:var(--gold-dk);border-color:var(--gold)}
 .mdet-status-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;align-items:center;flex-wrap:wrap}
 .mdet-status-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;margin-right:2px}
-.mdet-sf-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;font-family:inherit;transition:all .12s;opacity:.45}
+.mdet-sf-btn{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;font-family:inherit;transition:all .12s;opacity:.45}
 .mdet-sf-btn.on{opacity:1}
 .sf-h.on{border-color:var(--green);background:var(--green-lt);color:var(--green)}
 .sf-i.on{border-color:var(--amber);background:var(--amber-lt);color:var(--amber)}
 .sf-a.on{border-color:var(--red);background:var(--red-lt);color:var(--red)}
 .sf-x.on{border-color:var(--border);background:var(--bg3);color:var(--text2)}
-.mdet-sf-reset{font-size:10px;padding:3px 8px;border-radius:99px;border:none;background:none;color:var(--text3);cursor:pointer;font-family:inherit;text-decoration:underline;margin-left:2px}
+.mdet-sf-reset{font-size:10px;padding:3px 8px;border-radius:999px;border:none;background:none;color:var(--text3);cursor:pointer;font-family:inherit;text-decoration:underline;margin-left:2px}
 .mdet-sf-reset:hover{color:var(--text)}
 
 /* ══════════════════════════════════

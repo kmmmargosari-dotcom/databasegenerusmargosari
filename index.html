@@ -2101,7 +2101,7 @@
     <div class="izin-popup-icon" style="background:var(--green-lt);color:var(--green)"><svg class="ico" style="width:17px;height:17px"><use href="#ico-download"/></svg></div>
     <div>
       <div class="izin-popup-title" style="color:var(--green)">Export Semua Kelompok</div>
-      <div class="izin-popup-name">Caberawit • Pra Remaja • Remaja • Muda-Mudi — 1 PDF</div>
+      <div class="izin-popup-name">Pilih kelompok yang diekspor</div>
     </div>
     <button onclick="closeExAll()" style="margin-left:auto;background:none;border:none;font-size:16px;cursor:pointer;color:var(--text3)">✕</button>
   </div>
@@ -2141,8 +2141,13 @@
     <select id="exAllGender" class="exp-date-input" style="width:100%;box-sizing:border-box">
       <option value="S">Semua</option><option value="P">Perempuan</option><option value="L">Laki-laki</option>
     </select>
+    <label class="exp-date-lbl" style="margin-top:10px">Kelompok yang Diekspor</label>
+    <label class="exp-check-row"><input type="checkbox" id="exAllCatCaberawit" checked> Caberawit</label>
+    <label class="exp-check-row"><input type="checkbox" id="exAllCatPraRemaja" checked> Pra Remaja</label>
+    <label class="exp-check-row"><input type="checkbox" id="exAllCatRemaja" checked> Remaja</label>
+    <label class="exp-check-row"><input type="checkbox" id="exAllCatMudaMudi" checked> Muda-Mudi</label>
     <label class="exp-date-lbl" style="margin-top:10px">Isi Dokumen</label>
-    <label class="exp-check-row"><input type="checkbox" id="exAllSum" checked> Halaman ringkasan perbandingan 4 kelompok</label>
+    <label class="exp-check-row"><input type="checkbox" id="exAllSum" checked> Halaman ringkasan perbandingan</label>
     <label class="exp-check-row"><input type="checkbox" id="exAllChart"> Sertakan grafik tiap kelompok</label>
     <label class="exp-check-row"><input type="checkbox" id="exAllKas"> Sertakan kas tiap kelompok</label>
     <label class="exp-check-row"><input type="checkbox" id="exAllHemat" checked> Hemat kertas (lanjut tanpa halaman baru bila muat)</label>

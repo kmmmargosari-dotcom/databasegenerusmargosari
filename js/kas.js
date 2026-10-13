@@ -626,54 +626,54 @@ function kasBuildLaporanHtml(o){
     asideHtml +
     '<div style="min-width:0">' + tableHtml + '</div>' +
   '</div>';
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
     '<title>Laporan Keuangan ' + escHtml(grpNama) + ' Margosari — ' + escHtml(periodeLabel) + '</title>' +
     '<link rel="preconnect" href="https://fonts.googleapis.com">' +
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
     '<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">' +
-    '<style>@page{size:A4 landscape;margin:8mm}' +
+    '<style>@page{size:A4 landscape;margin:6mm}' +
     '*{box-sizing:border-box;margin:0;padding:0}' +
-    'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;color:#1f2937;background:#ffffff;padding:7mm 9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-    '.kophd{display:flex;justify-content:space-between;gap:16px;padding-bottom:10px;margin-bottom:4px;border-bottom:3px solid #1b4332;break-inside:avoid;page-break-inside:avoid}' +
-    '.kop-l{display:flex;gap:12px;align-items:flex-start;min-width:0}' +
-    '.kop-ic{width:52px;height:52px;border-radius:14px;background:#ebf5f0;border:1px solid #c1ecd4;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
-    '.kop-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#1b4332;background:#ebf5f0;border:1px solid #c1ecd4;border-radius:99px;padding:2px 10px}' +
-    '.kop-h1{font-family:"Zilla Slab",Georgia,serif;font-weight:700;font-size:24px;color:#1f2937;margin-top:2px}' +
-    '.kop-sub{font-size:11px;color:#717973;margin-top:1px}' +
+    'body{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:9px;color:#1f2937;background:#ffffff;padding:5mm 7mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+    '.kophd{display:flex;justify-content:space-between;gap:12px;padding-bottom:6px;margin-bottom:3px;border-bottom:1px solid #1b4332;break-inside:avoid;page-break-inside:avoid}' +
+    '.kop-l{display:flex;gap:8px;align-items:flex-start;min-width:0}' +
+    '.kop-ic{width:40px;height:40px;border-radius:10px;background:#ebf5f0;border:1px solid #c1ecd4;display:flex;align-items:center;justify-content:center;flex-shrink:0}' +
+    '.kop-badge{display:inline-block;font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#1b4332;background:#ebf5f0;border:1px solid #c1ecd4;border-radius:99px;padding:1px 8px}' +
+    '.kop-h1{font-family:"Zilla Slab",Georgia,serif;font-weight:700;font-size:18px;color:#1f2937;margin-top:1px}' +
+    '.kop-sub{font-size:9px;color:#717973;margin-top:1px}' +
     '.kop-r{text-align:right;flex-shrink:0}' +
-    '.kop-pl{font-size:9px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#717973}' +
-    '.kop-per{font-size:14px;font-weight:700;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;margin-top:2px}' +
-    '.kop-tag{display:inline-block;font-size:9.5px;font-weight:700;color:#ffffff;background:#1b4332;border-radius:99px;padding:2px 11px;margin-top:5px}' +
+    '.kop-pl{font-size:7px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#717973}' +
+    '.kop-per{font-size:11px;font-weight:700;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;margin-top:1px}' +
+    '.kop-tag{display:inline-block;font-size:7px;font-weight:700;color:#ffffff;background:#1b4332;border-radius:99px;padding:1px 8px;margin-top:3px}' +
     'table thead{display:table-header-group}' +
-    'table thead th{background:#1b4332;color:#ffffff;font-size:8.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:7px 9px;text-align:left;border:1px solid #1b4332}' +
+    'table thead th{background:#1b4332;color:#ffffff;font-size:7px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:5px 7px;text-align:left;border:1px solid #1b4332}' +
     'table thead th:last-child{border-right:1px solid #1b4332}' +
-    'table tbody td{padding:6px 9px;border:1px solid #e8e6df;vertical-align:top;font-size:10.5px;overflow-wrap:break-word;word-break:break-word}' +
+    'table tbody td{padding:4px 6px;border:1px solid #e8e6df;vertical-align:top;font-size:8.5px;overflow-wrap:break-word;word-break:break-word}' +
     'table tbody td.num,table td.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}' +
     'table tbody tr{break-inside:avoid;page-break-inside:avoid}' +
     'table tfoot{display:table-row-group}' +
-    'table tfoot td{padding:8px 9px;border:1px solid #e8e6df;border-top:2px solid #1b4332;background:#fbf9f6;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:10.5px}' +
-    '.sig{margin-top:14px;padding-top:10px;border-top:1px solid #e8e6df;display:flex;gap:16px;align-items:flex-end;break-inside:avoid;page-break-inside:avoid;break-before:avoid;page-break-before:avoid}' +
-    '.sig-meta{flex:1;min-width:0;font-size:9.5px;color:#717973;line-height:1.7}' +
-    '.sig-cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;width:360px;flex-shrink:0;text-align:center}' +
-    '.sig-role{font-size:10.5px;color:#4b5563}' +
-    '.sig-space{height:56px}' +
-    '.sig-name{border-top:1px solid #717973;padding-top:5px;font-size:10.5px;font-weight:700;text-transform:uppercase}' +
-    '.sig-sub{font-size:9px;color:#717973;margin-top:1px}' +
+    'table tfoot td{padding:6px 7px;border:1px solid #e8e6df;border-top:1px solid #1b4332;background:#fbf9f6;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:8.5px}' +
+    '.sig{margin-top:10px;padding-top:6px;border-top:1px solid #e8e6df;display:flex;gap:12px;align-items:flex-end;break-inside:avoid;page-break-inside:avoid;break-before:avoid;page-break-before:avoid}' +
+    '.sig-meta{flex:1;min-width:0;font-size:7.5px;color:#717973;line-height:1.5}' +
+    '.sig-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:280px;flex-shrink:0;text-align:center}' +
+    '.sig-role{font-size:8px;color:#4b5563}' +
+    '.sig-space{height:40px}' +
+    '.sig-name{border-top:1px solid #717973;padding-top:3px;font-size:8.5px;font-weight:700;text-transform:uppercase}' +
+    '.sig-sub{font-size:7px;color:#717973;margin-top:1px}' +
     '@media print{body{background:#ffffff}}' +
     '</style></head><body>' +
     '<div class="kophd"><div class="kop-l"><div class="kop-ic">' +
-      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1b4332" stroke-width="1.8"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>' +
       '<div><span class="kop-badge">Laporan Rekapitulasi Keuangan</span>' +
       '<div class="kop-h1">' + escHtml(grpNama) + ' Margosari</div>' +
       '<div class="kop-sub">Laporan Arus Kas Periode Berjalan</div></div></div>' +
     '<div class="kop-r"><div class="kop-pl">Periode Aktif Pembukuan</div>' +
       '<div class="kop-per">' + escHtml(periodeLabel) + '</div>' +
-      '<span class="kop-tag">Kas &amp; Keuangan</span></div></div>' +
+      '<span class="kop-tag">Kas & Keuangan</span></div></div>' +
     kpiHtml + body2col +
     '<div class="sig"><div class="sig-meta">Dicetak: ' + escHtml(printedAt) + '<br>Sistem Rekap Absensi ' + escHtml(grpNama) + ' Margosari</div>' +
     '<div class="sig-cols"><div><div class="sig-role">Bendahara Keuangan,</div><div class="sig-space"></div>' +
       '<div class="sig-name">Bendahara ' + escHtml(grpNama) + '</div><div class="sig-sub">Pengelola Kas Margosari</div></div>' +
-    '<div><div class="sig-role">Mengetahui &amp; Menyetujui,</div><div class="sig-space"></div>' +
+    '<div><div class="sig-role">Mengetahui & Menyetujui,</div><div class="sig-space"></div>' +
       '<div class="sig-name">Ketua / Penanggung Jawab</div><div class="sig-sub">' + escHtml(grpNama) + ' Margosari</div></div></div></div>' +
     '</body></html>';
 }

@@ -315,7 +315,7 @@ function exAllGroupSectionHtml(gdata, dariDate, sampaiDate, rg, o, newPage, cust
     return buildRekapGroupSectionHtml(d, { insight: true, kas: !!o.kas, chart: !!o.chart, emptyNote: true }, gdata.displayName);
   });
   var cls = newPage ? 'grp-newpage' : 'grp-continue';
-  return '<div class="grp-section ' + cls + '"><div class="grp-title">' + escHtml(gdata.displayName) + ' Margosari</div>' + html + '</div>';
+  return '<div class="grp-section ' + cls + '">' + html + '</div>';
 }
 
 // Tabel ringkasan perbandingan 4 kelompok (1 halaman).
@@ -410,7 +410,7 @@ function exAllSetBusy(busy, label){
   });
 }
 
-// Buat SATU PDF berisi keempat kelompok. Gagal di satu kelompok tidak
+// Buat SATU PDF berisi kelompok yang dipilih. Gagal di satu kelompok tidak
 // menghentikan yang lain: tawarkan lanjut tanpa kelompok itu atau batal.
 function eksporSemuaKelompok(){
   if(!isAdminLogin()){
@@ -431,9 +431,21 @@ function eksporSemuaKelompok(){
     kas: checked('exAllKas') || checked('exAllKasM'),
     hemat: checked('exAllHemat') || checked('exAllHematM')
   };
-  var gids = GROUPS_LIST.map(function(g){ return g.id; });
-  exAllSetBusy(true, 'Mengambil data 4 kelompok…');
-  showToast('Mengambil data 4 kelompok…', 30000);
+  // Cek kategori yang dipilih
+  var selectedGroups = [];
+  if(checked('exAllCatCaberawit')) selectedGroups.push('caberawit');
+  if(checked('exAllCatPraRemaja')) selectedGroups.push('praremaja');
+  if(checked('exAllCatRemaja')) selectedGroups.push('remaja');
+  if(checked('exAllCatMudaMudi')) selectedGroups.push('mudamudi');
+  
+  if(selectedGroups.length === 0){
+    appAlert('Pilih minimal satu kelompok untuk diekspor.');
+    return;
+  }
+  
+  var gids = selectedGroups;
+  exAllSetBusy(true, 'Mengambil data ' + selectedGroups.length + ' kelompok…');
+  showToast('Mengambil data ' + selectedGroups.length + ' kelompok…', 30000);
   var promises = gids.map(function(gid){
     return loadGroupData(gid).then(function(gdata){
       return { ok: true, gdata: gdata };
@@ -451,8 +463,13 @@ function eksporSemuaKelompok(){
       });
       var parts = [];
       var printedAt = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
-      parts.push('<div class="print-hd"><h2>Rekap Semua Kelompok Margosari</h2>' +
-        '<div class="subtitle">' + escHtml(periodLabel) + ' • Dicetak: ' + escHtml(printedAt) + '</div></div>');
+      var selectedLabels = okResults.map(function(x){
+        try {
+          var g = GROUPS_LIST.find(function(gg){ return gg.id === x.gdata.gid; });
+          return g ? g.label : x.gdata.gid;
+        } catch(e){ return x.gdata.gid; }
+      }).join(', ');
+      // Header utama dihapus - setiap kelompok sudah punya header sendiri di buildRekapGroupSectionHtml
       if(o.summary) parts.push(exAllSummaryHtml(summaries, periodLabel));
       okResults.forEach(function(x, i){
         parts.push(exAllGroupSectionHtml(x.gdata, dariDate, sampaiDate, rg, o, (!o.hemat && (i > 0 || o.summary)), customDari, customSampai));
@@ -467,7 +484,7 @@ function eksporSemuaKelompok(){
         parts.push('<div class="tbl-card" style="padding:10px 14px;color:#ba1a1a">Kelompok yang tidak ikut (gagal dimuat): ' + escHtml(names) + '.</div>');
       }
       _printWithIframe(
-        rekapDocHeadHtml('Rekap Semua Kelompok — ' + periodLabel) +
+        rekapDocHeadHtml('Rekap Absensi — ' + periodLabel) +
         parts.join('') +
         '</body></html>'
       );
